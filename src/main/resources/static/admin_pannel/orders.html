@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Orders | E-commerce Admin</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .status-badge {
+            display: inline-block;
+            padding: 0.25em 0.6em;
+            font-size: 75%;
+            font-weight: 700;
+            line-height: 1;
+            text-align: center;
+            white-space: nowrap;
+            vertical-align: baseline;
+            border-radius: 0.375rem;
+            color: #fff; /* Default text color */
+        }
+        .status-placed { background-color: #007bff; } /* Blue */
+        .status-pending { background-color: #ffc107; color: #333;} /* Yellow */
+        .status-shipped { background-color: #17a2b8; } /* Cyan */
+        .status-completed { background-color: #28a745; } /* Green */
+        .status-cancelled { background-color: #dc3545; } /* Red */
+        /* Basic Modal Styles if not already in style.css */
+        .modal {
+            display: none; /* Hidden by default */
+            position: fixed; /* Stay in place */
+            z-index: 1000; /* Sit on top */
+            left: 0;
+            top: 0;
+            width: 100%; /* Full width */
+            height: 100%; /* Full height */
+            overflow: auto; /* Enable scroll if needed */
+            background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+        }
+        .modal-content {
+            background-color: #fefefe;
+            margin: 5% auto; /* 5% from the top and centered */
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%; /* Could be more or less, depending on screen size */
+            max-width: 700px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            position: relative;
+        }
+        .modal-header {
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .modal-header h3 {
+            margin: 0;
+            font-size: 1.5em;
+        }
+        .modal-body {
+            padding-bottom: 20px;
+        }
+        .modal-footer {
+            border-top: 1px solid #eee;
+            padding-top: 15px;
+            text-align: right;
+        }
+        .modal-footer button {
+            margin-left: 10px;
+        }
+        .modal .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            position: absolute;
+            right: 20px;
+            top: 15px;
+        }
+        .modal .close:hover,
+        .modal .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-control {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .btn {
+            padding: 8px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: background-color 0.2s ease;
+        }
+        .btn-primary { background-color: #007bff; color: white; }
+        .btn-primary:hover { background-color: #0056b3; }
+        .btn-info { background-color: #17a2b8; color: white; }
+        .btn-info:hover { background-color: #117a8b; }
+        .btn-danger { background-color: #dc3545; color: white; }
+        .btn-danger:hover { background-color: #bd2130; }
+        .btn:not(.btn-primary):not(.btn-info):not(.btn-danger) {
+            background-color: #f0f0f0;
+            color: #333;
+        }
+        .btn:not(.btn-primary):not(.btn-info):not(.btn-danger):hover {
+            background-color: #e0e0e0;
+        }
+        .alert {
+            padding: 15px;
+            margin-bottom: 20px;
+            border: 1px solid transparent;
+            border-radius: 4px;
+        }
+        .alert-success {
+            color: #155724;
+            background-color: #d4edda;
+            border-color: #c3e6cb;
+        }
+        .alert-danger {
+            color: #721c24;
+            background-color: #f8d7da;
+            border-color: #f5c6cb;
+        }
+        .alert-warning {
+            color: #856404;
+            background-color: #fff3cd;
+            border-color: #ffeeba;
+        }
+        .table-responsive {
+            overflow-x: auto;
+        }
+        #ordersTable {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        #ordersTable th, #ordersTable td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        #ordersTable th {
+            background-color: #f2f2f2;
+            font-weight: bold;
+        }
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .card {
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .card-header {
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+            margin-bottom: 20px;
+        }
+        .card-header h3 {
+            margin: 0;
+            font-size: 1.2em;
+        }
+    </style>
+</head>
+<body>
+    <div id="sidebar-placeholder"></div>
+
+    <div class="main">
+        <div id="top-navbar-placeholder"></div>
+
+        <div class="content">
+            <div class="page-header">
+                <h2>Orders Management</h2>
+                <div>
+                    <select id="statusFilter" class="form-control" style="width: auto; display: inline-block;">
+                        <option value="">All Statuses</option>
+                        <option value="PLACED">Placed</option>
+                        <option value="PENDING">Pending</option>
+                        <option value="SHIPPED">Shipped</option>
+                        <option value="COMPLETED">Completed</option>
+                        <option value="CANCELLED">Cancelled</option>
+                    </select>
+                </div>
+            </div>
+
+            <div id="alertContainer"></div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h3>All Orders</h3>
+                </div>
+                <div class="table-responsive">
+                    <table id="ordersTable">
+                        <thead>
+                            <tr>
+                                <th>Order ID</th>
+                                <th>Customer</th>
+                                <th>Date</th>
+                                <th>Amount</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td colspan="6" class="text-center">Loading orders...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="orderDetailsModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Order Details</h3>
+                <span class="close">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div id="orderDetailsContent">
+                    </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn" onclick="document.getElementById('orderDetailsModal').style.display='none'">Close</button>
+                <button type="button" class="btn btn-primary" id="updateOrderStatusBtn">Update Status</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="updateStatusModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Update Order Status</h3>
+                <span class="close">&times;</span>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="currentOrderId">
+                <div class="form-group">
+                    <label for="orderStatus">Status</label>
+                    <select id="orderStatus" class="form-control">
+                        <option value="PENDING">Pending</option>
+                        <option value="PLACED">Placed</option>
+                        <option value="SHIPPED">Shipped</option>
+                        <option value="COMPLETED">Completed</option>
+                        <option value="CANCELLED">Cancelled</option>
+                    </select>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn" onclick="document.getElementById('updateStatusModal').style.display='none'">Cancel</button>
+                <button type="button" class="btn btn-primary" id="confirmStatusUpdateBtn">Update</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script>
+        $(function() {
+            $("#sidebar-placeholder").load("sidebar.html");
+            $("#top-navbar-placeholder").load("topnav.html");
+        });
+    </script>
+
+    <script src="js/main.js"></script>
+    <script src="js/orders.js"></script> 
+    <script src="js/sidebar.js"></script>
+    <script src="js/topnav.js"></script>
+
+</body>
+</html>

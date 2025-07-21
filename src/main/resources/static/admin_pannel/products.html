@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Products | Admin Panel</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"/>
+  <link rel="stylesheet" href="css/style.css"/>
+</head>
+<style>
+  /* ===== Modal Centering & Styling ===== */
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 9999;
+  background: rgba(0, 0, 0, 0.5);
+
+  display: none;
+  justify-content: center;
+  align-items: center;
+  overflow: auto;
+}
+
+.modal-content {
+  background: #fff;
+  padding: 24px;
+  border-radius: 10px;
+  width: 90%;
+  max-width: 600px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+  margin: auto;
+}
+
+/* ===== Header / Footer ===== */
+.modal-header,
+.modal-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.modal-header h3 {
+  margin: 0;
+  font-size: 1.5rem;
+}
+
+.modal-header .close {
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: #555;
+}
+
+/* ===== Form Styling ===== */
+#productForm .form-group {
+  margin-bottom: 16px;
+  display: flex;
+  flex-direction: column;
+}
+
+#productForm input,
+#productForm select,
+#productForm textarea {
+  padding: 10px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  font-size: 1rem;
+  width: 100%;
+}
+
+/* ===== Spec field styling ===== */
+#specificationsContainer > div {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+#specificationsContainer input {
+  flex: 1;
+}
+
+#specificationsContainer button {
+  background: red;
+  color: white;
+  border: none;
+  padding: 4px 8px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+/* ===== Table Cleanup ===== */
+.table-responsive {
+  overflow-x: auto;
+}
+
+#productsTable {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+#productsTable th,
+#productsTable td {
+  padding: 10px;
+  text-align: left;
+  border-bottom: 1px solid #eee;
+}
+
+/* ===== Buttons ===== */
+.btn {
+  padding: 8px 16px;
+  font-size: 0.95rem;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.btn-primary {
+  background-color: #007bff;
+  color: white;
+}
+
+.btn-sm {
+  padding: 4px 8px;
+  font-size: 0.85rem;
+}
+
+.btn-danger {
+  background-color: #dc3545;
+  color: white;
+}
+
+.btn-outline-info {
+  border: 1px solid #17a2b8;
+  color: #17a2b8;
+  background: none;
+  padding: 4px 8px;
+  border-radius: 4px;
+}
+
+/* ===== Alerts ===== */
+.alert {
+  padding: 10px 16px;
+  border-radius: 5px;
+  margin-bottom: 12px;
+}
+
+.alert-success {
+  background-color: #d4edda;
+  color: #155724;
+}
+
+.alert-danger {
+  background-color: #f8d7da;
+  color: #721c24;
+}
+
+</style>
+<body>
+<div id="sidebar-placeholder"></div>
+
+<div class="main">
+  <div id="top-navbar-placeholder"></div>
+
+  <div class="content">
+    <div class="page-header">
+      <h2>Product Management</h2>
+      <button class="btn btn-primary" id="addProductBtn">
+        <i class="fas fa-plus"></i> Add Product
+      </button>
+    </div>
+
+    <div id="alertContainer"></div>
+
+    <div class="card">
+      <div class="card-header"><h3>All Products</h3></div>
+      <div class="table-responsive">
+        <table id="productsTable">
+          <thead>
+            <tr>
+              <th>Image</th>
+              <th>Name</th>
+              <th>Price (₹)</th>
+              <th>Stock</th>
+              <th>Status</th>
+              <th>Category</th>
+              <th>Subcategory</th>
+              <th>Datasheet</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ✅ Add/Edit Modal -->
+<div class="modal" id="productModal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3 id="modalTitle">Add Product</h3>
+      <span class="close" onclick="closeModal()">&times;</span>
+    </div>
+    <div class="modal-body">
+      <form id="productForm">
+        <input type="hidden" id="productId" />
+
+        <div class="form-group">
+          <label>Name</label>
+          <input type="text" id="productName" required />
+        </div>
+
+        <div class="form-group">
+          <label>Description</label>
+          <textarea id="productDescription"></textarea>
+        </div>
+
+        <div class="form-group">
+          <label>Price</label>
+          <input type="number" id="productPrice" min="0" step="0.01" required />
+        </div>
+
+        <div class="form-group">
+          <label>Stock</label>
+          <input type="number" id="productStock" min="0" required />
+        </div>
+
+        <div class="form-group">
+          <label>Status</label>
+          <select id="productStatus">
+            <option value="ACTIVE">Active</option>
+            <option value="INACTIVE">Inactive</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Category</label>
+          <select id="categorySelect" required></select>
+        </div>
+
+        <div class="form-group">
+          <label>Subcategory</label>
+          <select id="subCategorySelect" required></select>
+        </div>
+
+        <div class="form-group">
+          <label>Specifications</label>
+          <div id="specificationsContainer"></div>
+          <button type="button" onclick="addSpecField()">+ Add Spec</button>
+        </div>
+
+        <div class="form-group">
+          <label>Image</label>
+          <input type="file" id="productImage" accept="image/*" />
+        </div>
+
+        <div class="form-group">
+          <label>Datasheet (PDF)</label>
+          <input type="file" id="productDatasheet" accept="application/pdf" />
+        </div>
+      </form>
+    </div>
+    <div class="modal-footer">
+      <button class="btn" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="submitProduct()">Save</button>
+    </div>
+  </div>
+</div>
+
+<script src="js/sidebar.js"></script>
+<script src="js/topnav.js"></script>
+<script>
+const API_BASE = "http://localhost:8080/api";
+const token = localStorage.getItem("adminToken");
+const headers = {
+  "Authorization": `Bearer ${token}`,
+  "Content-Type": "application/json",
+};
+
+if (!token) {
+  alert("Login required");
+  window.location.href = "admin-login.html";
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  loadProducts();
+  loadCategories();
+  document.getElementById("addProductBtn").addEventListener("click", showAddModal);
+  document.getElementById("categorySelect").addEventListener("change", loadSubCategories);
+});
+
+function showAddModal() {
+  document.getElementById("modalTitle").innerText = "Add Product";
+  document.getElementById("productForm").reset();
+  document.getElementById("productId").value = "";
+  document.getElementById("specificationsContainer").innerHTML = "";
+  document.getElementById("productModal").style.display = "block";
+}
+
+function closeModal() {
+  document.getElementById("productModal").style.display = "none";
+}
+
+function loadCategories() {
+  fetch(`${API_BASE}/categories`, { headers })
+    .then(res => res.json())
+    .then(categories => {
+      const categorySelect = document.getElementById("categorySelect");
+      categorySelect.innerHTML = `<option value="">Select Category</option>`;
+      categories.forEach(cat => {
+        categorySelect.innerHTML += `<option value="${cat.id}">${cat.name}</option>`;
+      });
+    });
+}
+
+function loadSubCategories() {
+  const catId = document.getElementById("categorySelect").value;
+  fetch(`${API_BASE}/subcategories/by-category/${catId}`, { headers })
+    .then(res => res.json())
+    .then(subcats => {
+      const subCatSelect = document.getElementById("subCategorySelect");
+      subCatSelect.innerHTML = `<option value="">Select Subcategory</option>`;
+      subcats.forEach(sc => {
+        subCatSelect.innerHTML += `<option value="${sc.id}">${sc.name}</option>`;
+      });
+    });
+}
+
+function loadProducts() {
+  fetch(`${API_BASE}/products/admin/all`, { headers })
+    .then(res => res.json())
+    .then(products => {
+      const tbody = document.querySelector("#productsTable tbody");
+      tbody.innerHTML = "";
+      products.forEach(p => {
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td><img src="${p.imageUrl || 'placeholder.jpg'}" width="50" /></td>
+          <td>${p.name}</td>
+          <td>${p.price}</td>
+          <td>${p.stock}</td>
+          <td>${p.status}</td>
+          <td>${p.categoryName || "N/A"}</td>
+          <td>${p.subCategoryName || "N/A"}</td>
+          <td>
+            ${p.datasheetUrl ? `<a href="${p.datasheetUrl}" target="_blank" class="btn btn-sm btn-outline-info">Download</a>` : `<span class="text-muted">No file</span>`}
+          </td>
+          <td>
+            <button class="btn btn-sm btn-primary" onclick="editProduct(${p.id})">Edit</button>
+            <button class="btn btn-sm btn-danger" onclick="deleteProduct(${p.id})">Delete</button>
+          </td>
+        `;
+        tbody.appendChild(row);
+      });
+    });
+}
+
+function addSpecField(k = "", v = "") {
+  const container = document.getElementById("specificationsContainer");
+  const div = document.createElement("div");
+  div.innerHTML = `
+    <input type="text" placeholder="Key" value="${k}" />
+    <input type="text" placeholder="Value" value="${v}" />
+    <button type="button" onclick="this.parentElement.remove()">x</button>
+  `;
+  container.appendChild(div);
+}
+
+function submitProduct() {
+  const id = document.getElementById("productId").value;
+  const payload = {
+    name: document.getElementById("productName").value,
+    description: document.getElementById("productDescription").value,
+    price: parseFloat(document.getElementById("productPrice").value),
+    stock: parseInt(document.getElementById("productStock").value),
+    status: document.getElementById("productStatus").value,
+    subCategoryId: parseInt(document.getElementById("subCategorySelect").value),
+    specifications: [...document.querySelectorAll("#specificationsContainer div")].map(div => ({
+      key: div.children[0].value,
+      value: div.children[1].value
+    }))
+  };
+
+  const method = id ? "PUT" : "POST";
+  const url = id ? `${API_BASE}/products/admin/${id}` : `${API_BASE}/products/admin`;
+
+  fetch(url, {
+    method,
+    headers,
+    body: JSON.stringify(payload)
+  })
+  .then(res => res.json())
+  .then(data => {
+    const image = document.getElementById("productImage").files[0];
+    const datasheet = document.getElementById("productDatasheet").files[0];
+
+    if (image) {
+      const formData = new FormData();
+      formData.append("image", image);
+      fetch(`${API_BASE}/products/admin/${data.id}/image`, {
+        method: "POST",
+        headers: { "Authorization": `Bearer ${token}` },
+        body: formData
+      });
+    }
+
+    if (datasheet) {
+      const formData = new FormData();
+      formData.append("file", datasheet);
+      fetch(`${API_BASE}/products/admin/${data.id}/datasheet`, {
+        method: "POST",
+        headers: { "Authorization": `Bearer ${token}` },
+        body: formData
+      });
+    }
+
+    showAlert("Product saved successfully", "success");
+    closeModal();
+    loadProducts();
+  });
+}
+
+function editProduct(id) {
+  fetch(`${API_BASE}/products/admin/${id}`, { headers })
+    .then(res => res.json())
+    .then(p => {
+      document.getElementById("productId").value = p.id;
+      document.getElementById("productName").value = p.name;
+      document.getElementById("productDescription").value = p.description;
+      document.getElementById("productPrice").value = p.price;
+      document.getElementById("productStock").value = p.stock;
+      document.getElementById("productStatus").value = p.status;
+      document.getElementById("modalTitle").innerText = "Edit Product";
+      document.getElementById("specificationsContainer").innerHTML = "";
+      p.specifications?.forEach(s => addSpecField(s.key, s.value));
+      document.getElementById("productImage").value = "";
+      document.getElementById("productDatasheet").value = "";
+      loadCategories();
+      setTimeout(() => {
+        document.getElementById("categorySelect").value = "";
+        loadSubCategories();
+        setTimeout(() => {
+          document.getElementById("subCategorySelect").value = p.subCategoryId;
+        }, 300);
+      }, 300);
+      document.getElementById("productModal").style.display = "block";
+    });
+}
+
+function deleteProduct(id) {
+  if (confirm("Are you sure to delete this product?")) {
+    fetch(`${API_BASE}/products/admin/${id}`, {
+      method: "DELETE",
+      headers
+    }).then(() => {
+      showAlert("Product deleted", "success");
+      loadProducts();
+    });
+  }
+}
+
+function showAlert(msg, type = "success") {
+  const div = document.createElement("div");
+  div.className = `alert alert-${type}`;
+  div.innerText = msg;
+  document.getElementById("alertContainer").innerHTML = "";
+  document.getElementById("alertContainer").appendChild(div);
+  setTimeout(() => div.remove(), 3000);
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  document.getElementById("productModal").style.display = "none"; // ✅ Force hidden
+  loadProducts();
+  loadCategories();
+  document.getElementById("addProductBtn").addEventListener("click", showAddModal);
+  document.getElementById("categorySelect").addEventListener("change", loadSubCategories);
+});
+
+function closeModal() {
+  document.getElementById("productModal").style.display = "none";
+  document.getElementById("productForm").reset(); // Reset form fields
+  document.getElementById("specificationsContainer").innerHTML = ""; // Clear specs
+}
+</script>
+</body>
+</html>

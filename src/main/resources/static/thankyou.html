@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thank You for Your Order!</title>
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/index.css"> <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: #f8f9fa;
+            font-family: 'Inter', sans-serif; /* Consistent with your header */
+        }
+        .thank-you-container {
+            text-align: center;
+            background: #fff;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            max-width: 600px;
+            width: 90%;
+        }
+        .thank-you-container h1 {
+            color: #1989AC; /* Your theme color */
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+        }
+        .thank-you-container p {
+            font-size: 1.1rem;
+            color: #555;
+            margin-bottom: 15px;
+        }
+        .thank-you-container .spinner-border {
+            color: #1989AC;
+            margin-top: 20px;
+        }
+        .thank-you-container .redirect-message {
+            margin-top: 30px;
+            font-size: 0.9rem;
+            color: #777;
+        }
+    </style>
+</head>
+<body>
+    <div class="thank-you-container">
+        <h1>🎉 Thank You for Your Order!</h1>
+        <p>Your order has been placed successfully.</p>
+        <p>We've sent a confirmation email with details to your registered email address.</p>
+        <div class="spinner-border" role="status">
+            <span class="sr-only">Loading...</span>
+        </div>
+        <p class="redirect-message">You will be redirected to the homepage shortly...</p>
+    </div>
+
+    <script>
+        // Redirect to index.html after 3 seconds
+        setTimeout(function() {
+            window.location.href = 'index.html';
+        }, 3000); // 3000 milliseconds = 3 seconds
+    </script>
+</body>
+</html>

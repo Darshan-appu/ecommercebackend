@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Checkout - AEROMATX</title>
+
+    <link href="https://fonts.googleapis.com/css?family=Montserrat:400,500,700" rel="stylesheet">
+
+    <link type="text/css" rel="stylesheet" href="css/bootstrap.min.css"/>
+
+    <link type="text/css" rel="stylesheet" href="css/slick.css"/>
+    <link type="text/css" rel="stylesheet" href="css/slick-theme.css"/>
+
+    <link type="text/css" rel="stylesheet" href="css/nouislider.min.css"/>
+
+    <link rel="stylesheet" href="css/font-awesome.min.css">
+
+    <link type="text/css" rel="stylesheet" href="css/checkout.css"/> 
+
+    </head>
+<body>
+    <div id="header-placeholder"></div>
+    <div class="section">
+        <div class="container">
+            <div class="row">
+
+                <div class="col-md-7">
+                    <div class="billing-details">
+                        <div class="section-title">
+                            <h3 class="title">Billing address</h3>
+                        </div>
+                        <div class="form-group">
+                            <input class="input" type="text" name="first-name" placeholder="First Name" id="billing-first-name" required>
+                        </div>
+                        <div class="form-group">
+                            <input class="input" type="text" name="last-name" placeholder="Last Name" id="billing-last-name" required>
+                        </div>
+                        <div class="form-group">
+                            <input class="input" type="email" name="email" placeholder="Email" id="billing-email" required>
+                        </div>
+                        <div class="form-group">
+                            <input class="input" type="text" name="address" placeholder="Address" id="billing-address" required>
+                        </div>
+                        <div class="form-group">
+                            <input class="input" type="text" name="city" placeholder="City" id="billing-city" required>
+                        </div>
+                        <div class="form-group">
+                            <input class="input" type="text" name="country" placeholder="Country" id="billing-country" required>
+                        </div>
+                        <div class="form-group">
+                            <input class="input" type="text" name="zip-code" placeholder="ZIP Code" id="billing-zip-code" required>
+                        </div>
+                        <div class="form-group">
+                            <input class="input" type="tel" name="tel" placeholder="Telephone" id="billing-tel" required>
+                        </div>
+                    </div>
+                    <div class="shiping-details">
+                        <div class="section-title">
+                            <h3 class="title">Shipping address</h3>
+                        </div>
+                        <div class="input-checkbox">
+                            <input type="checkbox" id="shiping-address-checkbox" name="shiping-address-checkbox">
+                            <label for="shiping-address-checkbox">
+                                <span></span>
+                                Ship to a different address?
+                            </label>
+                            <div class="caption" id="shipping-address-fields">
+                                <div class="form-group">
+                                    <input class="input" type="text" name="shipping-first-name" placeholder="First Name">
+                                </div>
+                                <div class="form-group">
+                                    <input class="input" type="text" name="shipping-last-name" placeholder="Last Name">
+                                </div>
+                                <div class="form-group">
+                                    <input class="input" type="email" name="shipping-email" placeholder="Email">
+                                </div>
+                                <div class="form-group">
+                                    <input class="input" type="text" name="shipping-address" placeholder="Address" id="shipping-address">
+                                </div>
+                                <div class="form-group">
+                                    <input class="input" type="text" name="shipping-city" placeholder="City">
+                                </div>
+                                <div class="form-group">
+                                    <input class="input" type="text" name="shipping-country" placeholder="Country">
+                                </div>
+                                <div class="form-group">
+                                    <input class="input" type="text" name="shipping-zip-code" placeholder="ZIP Code">
+                                </div>
+                                <div class="form-group">
+                                    <input class="input" type="tel" name="shipping-tel" placeholder="Telephone">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="order-notes">
+                        <textarea class="input" placeholder="Order Notes" id="order-notes"></textarea>
+                    </div>
+                    </div>
+
+                <div class="col-md-5 order-details">
+                    <div class="section-title text-center">
+                        <h3 class="title">Your Order</h3>
+                    </div>
+                    <div class="order-summary">
+                        <div class="order-col">
+                            <div><strong>PRODUCT</strong></div>
+                            <div><strong>TOTAL</strong></div>
+                        </div>
+                        <div class="order-products" id="checkout-items-container">
+                            <p>Loading cart items...</p>
+                        </div>
+                        <div class="order-col">
+                            <div>Shipping</div>
+                            <div><strong>FREE</strong></div>
+                        </div>
+                        <div class="order-col">
+                            <div><strong>TOTAL</strong></div>
+                            <div><strong class="order-total">₹<span id="modal-total">0.00</span></strong></div>
+                        </div>
+                    </div>
+                    <div class="payment-method">
+                        <div class="input-radio">
+                            <input type="radio" name="payment" id="payment-1" value="bank_transfer" checked>
+                            <label for="payment-1">
+                                <span></span>
+                                Direct Bank Transfer
+                            </label>
+                            <div class="caption">
+                                <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
+                            </div>
+                        </div>
+                        <div class="input-radio">
+                            <input type="radio" name="payment" id="payment-2" value="cheque_payment">
+                            <label for="payment-2">
+                                <span></span>
+                                Cheque Payment
+                            </label>
+                            <div class="caption">
+                                <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
+                            </div>
+                        </div>
+                        <div class="input-radio">
+                            <input type="radio" name="payment" id="payment-3" value="paypal">
+                            <label for="payment-3">
+                                <span></span>
+                                Paypal System
+                            </label>
+                            <div class="caption">
+                                <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="input-checkbox">
+                        <input type="checkbox" id="terms" name="terms-checkbox" required>
+                        <label for="terms">
+                            <span></span>
+                            I've read and accept the <a href="#">terms & conditions</a>
+                        </label>
+                    </div>
+                    <form id="checkout-form">
+                         <button type="submit" class="primary-btn order-submit">Place order</button>
+                    </form>
+                </div>
+                </div>
+            </div>
+        </div>
+    <div id="footer-placeholder"></div>
+    <script src="js/jquery.min.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+    <script src="js/slick.min.js"></script>
+    <script src="js/nouislider.min.js"></script>
+    <script src="js/jquery.zoom.min.js"></script>
+    <script src="js/main1.js"></script>
+    <script src="js/navigation.js"></script>
+    <script src="js/profileBehviour.js"></script>
+    <script src="js/frontend-header.js"></script>
+    <script src="js/profile_update.js"></script>
+
+    <script>
+        // Ensure jQuery is loaded before this script block
+        $(function () {
+            // Step 1: Load the header
+            $("#header-placeholder").load("header.html", function () {
+                console.log("✅ header.html loaded");
+
+                // Step 2: Load cart logic (cart.js)
+                const cartScript = document.createElement('script');
+                cartScript.src = 'js/cart.js';
+                document.body.appendChild(cartScript);
+                cartScript.onload = () => {
+                     console.log("✅ cart.js loaded after header");
+                     loadCart(); // Call the function from the integrated checkout logic
+                };
+
+                // Step 3: Load frontend-header logic (frontend-header.js)
+                const headerLogicScript = document.createElement('script');
+                headerLogicScript.src = 'js/frontend-header.js?t=' + new Date().getTime(); // prevent cache
+                headerLogicScript.onload = () => {
+                    if (typeof loadFrontendHeader === "function") {
+                        loadFrontendHeader();
+                    }
+                };
+                document.body.appendChild(headerLogicScript);
+
+                // Utility function to wait for an element to exist (not directly used in this flow, but kept for reference)
+                function waitForElement(selector, callback) {
+                    const checkExist = setInterval(() => {
+                        const el = document.querySelector(selector);
+                        if (el) {
+                            clearInterval(checkExist);
+                            callback(el);
+                        }
+                    }, 100);
+                }
+            });
+
+            // Load the footer
+            $("#footer-placeholder").load("footer.html", function () {
+                console.log("✅ footer.html loaded");
+            });
+        });
+
+
+        // --- START: Integrated JavaScript Logic from your second code ---
+        const token = localStorage.getItem("userToken");
+        // These are assumptions for prefilling. Ensure they are actually stored in localStorage.
+        const userEmail = localStorage.getItem("userEmail"); 
+        const userMobile = localStorage.getItem("userMobile"); 
+        const userPermanentAddress = localStorage.getItem("userPermanentAddress"); 
+        const userTemporaryAddress = localStorage.getItem("userTemporaryAddress"); 
+        // Add if available in localStorage
+        const userFirstName = localStorage.getItem("userFirstName"); 
+        const userLastName = localStorage.getItem("userLastName"); 
+        const userCity = localStorage.getItem("userCity"); 
+        const userCountry = localStorage.getItem("userCountry"); 
+        const userZipCode = localStorage.getItem("userZipCode"); 
+
+
+        let cartItems = [];
+        let isBuyNowMode = false;
+
+        function renderCart() {
+            const container = $('#checkout-items-container'); 
+            container.empty();
+            let total = 0;
+
+            if (cartItems.length === 0) {
+                container.append('<p>Your cart is empty.</p>');
+                $('#checkout-form button[type="submit"]').prop('disabled', true); 
+                return;
+            }
+
+            cartItems.forEach(item => {
+                const specs = item.specificationsJson ? JSON.parse(item.specificationsJson) : (item.specifications || {}); 
+                const specStr = Object.entries(specs).map(([k, v]) => `${k}: ${v}`).join(', ');
+                const price = item.product?.price || 0; 
+                const subtotal = price * item.quantity;
+                total += subtotal;
+
+                container.append(`
+                    <div class="order-col">
+                        <div>${item.quantity}x ${item.product?.name || 'Unknown Product'}</div>
+                        <div>₹${price.toFixed(2)}</div>
+                    </div>
+                    <div class="order-col" style="font-size: 0.8em; color: #777;">
+                        <div><small>${specStr}</small></div>
+                        <div></div> 
+                    </div>
+                `);
+            });
+
+            $('#modal-total').text((total + 0).toFixed(2)); // Shipping is FREE as per your static HTML example
+            $('#checkout-form button[type="submit"]').prop('disabled', false); 
+        }
+
+        async function loadCart() {
+            const urlParams = new URLSearchParams(window.location.search);
+            isBuyNowMode = urlParams.get('mode') === 'buynow';
+
+            if (isBuyNowMode) {
+                const buyNowData = sessionStorage.getItem('buyNowProduct');
+                if (buyNowData) {
+                    const { product, quantity, specifications } = JSON.parse(buyNowData);
+                    cartItems = [{
+                        product: product,
+                        quantity: quantity,
+                        specificationsJson: JSON.stringify(specifications),
+                        notes: '' 
+                    }];
+                    sessionStorage.removeItem('buyNowProduct'); 
+                } else {
+                    alert("No product found for Buy Now. Please try again.");
+                    window.location.href = 'index.html'; 
+                    return;
+                }
+            } else {
+                try {
+                    const response = await fetch('http://localhost:8080/api/cart', {
+                        headers: {
+                            'Authorization': 'Bearer ' + token
+                        }
+                    });
+                    if (!response.ok) {
+                        if (response.status === 401) {
+                            alert("⚠️ Your session has expired or you are not logged in. Please log in to proceed with checkout.");
+                            window.location.href = 'login.html';
+                            return;
+                        }
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    const data = await response.json();
+                    cartItems = data;
+                } catch (err) {
+                    alert("⚠️ Failed to load cart. Please ensure you are logged in and your backend is running.");
+                    console.error("Error loading cart:", err);
+                    window.location.href = 'index.html'; 
+                    return;
+                }
+            }
+            renderCart();
+            prefillAddresses();
+        }
+
+        function prefillAddresses() {
+            // Attempt to pre-fill billing details from localStorage
+            $('#billing-first-name').val(userFirstName || '');
+            $('#billing-last-name').val(userLastName || '');
+            $('#billing-email').val(userEmail || '');
+            $('#billing-tel').val(userMobile || '');
+            $('#billing-city').val(userCity || '');
+            $('#billing-country').val(userCountry || '');
+            $('#billing-zip-code').val(userZipCode || '');
+
+            if (userPermanentAddress) {
+                $('#billing-address').val(userPermanentAddress); 
+                if (!$('#shiping-address-checkbox').is(':checked')) {
+                    $('#shipping-address').val(userPermanentAddress); 
+                }
+            } else if (userTemporaryAddress) {
+                $('#billing-address').val(userTemporaryAddress); 
+                if (!$('#shiping-address-checkbox').is(':checked')) {
+                    $('#shipping-address').val(userTemporaryAddress); 
+                }
+            }
+            // Note: If 'Ship to a different address' is checked, you'd typically expect the
+            // shipping specific fields (first name, last name, etc. for shipping) to be filled separately.
+            // For now, if those aren't stored in localStorage, they will remain blank.
+        }
+
+        $('#checkout-form').submit(async function (e) {
+            e.preventDefault();
+
+            if (!token) {
+                alert("You must be logged in to place an order.");
+                window.location.href = 'login.html';
+                return;
+            }
+
+            if (cartItems.length === 0) {
+                alert("Your cart is empty. Please add items before placing an order.");
+                return;
+            }
+
+            const paymentMethod = $('input[name="payment"]:checked').val();
+            if (!paymentMethod) {
+                alert("Please select a payment method.");
+                return;
+            }
+
+            if (!$('#terms').is(':checked')) {
+                alert("Please accept the terms & conditions to place your order.");
+                return;
+            }
+
+            // Collect common order details from Billing section
+            const firstName = $('#billing-first-name').val();
+            const lastName = $('#billing-last-name').val();
+            const email = $('#billing-email').val();
+            const city = $('#billing-city').val();
+            const country = $('#billing-country').val();
+            const zipCode = $('#billing-zip-code').val();
+            const phone = $('#billing-tel').val();
+            const notes = $('#order-notes').val();
+
+            // Collect billing and shipping addresses
+            const billingAddress = $('#billing-address').val();
+            let shippingAddress = billingAddress; // Default to billing address
+
+            // If "Ship to a different address?" is checked, override shipping address and related details
+            if ($('#shiping-address-checkbox').is(':checked')) {
+                shippingAddress = $('input[name="shipping-address"]').val();
+                // If your backend also expects separate firstName, lastName, etc. for shipping,
+                // you would collect them from the shipping-specific fields here.
+                // For this update, we are assuming the *main* contact details (firstName, email, etc.)
+                // for the order come from the billing section, as per your backend example.
+            }
+
+            const items = cartItems.map(item => ({
+                productId: item.product.id,
+                quantity: item.quantity,
+                notes: item.notes || '',
+                specifications: item.specificationsJson ? JSON.parse(item.specificationsJson) : (item.specifications || {})
+            }));
+
+            const payload = {
+                billingAddress,
+                shippingAddress,
+                firstName,
+                lastName,
+                email,
+                city,
+                country,
+                zipCode,
+                phone,
+                notes,
+                paymentMethod,
+                items,
+            };
+
+            try {
+                const res = await fetch('http://localhost:8080/api/orders', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + token
+                    },
+                    body: JSON.stringify(payload)
+                });
+
+                if (!res.ok) {
+                    const errorBody = await res.text();
+                    throw new Error(`Order failed: ${res.status} - ${errorBody}`);
+                }
+
+                const data = await res.json();
+                alert("✅ Order placed successfully! Order ID: " + data.id);
+
+                if (!isBuyNowMode) {
+                    await fetch('http://localhost:8080/api/cart/clear', {
+                        method: 'DELETE',
+                        headers: {
+                            'Authorization': 'Bearer ' + token
+                        }
+                    }).catch(clearErr => console.error("Failed to clear cart:", clearErr));
+                }
+
+                window.location.href = 'thankyou.html'; 
+            } catch (err) {
+                alert("❌ Failed to place order: " + err.message);
+                console.error("Order placement error:", err);
+            }
+        });
+
+        // Event listener for the "Ship to a different address" checkbox
+        $('#shiping-address-checkbox').change(function() {
+            if ($(this).is(':checked')) {
+                $('#shipping-address-fields').slideDown();
+            } else {
+                $('#shipping-address-fields').slideUp();
+                // Optionally, clear the separate shipping fields if checkbox is unchecked
+                $('input[name^="shipping-"]').val('');
+            }
+        }).trigger('change'); 
+        // --- END: Integrated JavaScript Logic ---
+    </script>
+</body>
+</html>

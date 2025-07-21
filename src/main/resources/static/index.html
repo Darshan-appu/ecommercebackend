@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>AEROMATX</title>
+
+  <!-- Fonts & CSS -->
+  <link href="https://fonts.googleapis.com/css?family=Montserrat:400,500,700" rel="stylesheet">
+  <link rel="stylesheet" href="css/bootstrap.min.css">
+  <link rel="stylesheet" href="css/slick.css">
+  <link rel="stylesheet" href="css/slick-theme.css">
+  <link rel="stylesheet" href="css/font-awesome.min.css">
+  <link rel="stylesheet" href="css/index.css">
+  <link rel="stylesheet" href="css/satcom.css">
+  <style>
+    .no-datasheet { opacity: .6; pointer-events: none; }
+  </style>
+</head>
+
+<body>
+  <div id="header-placeholder"></div>
+
+  <!-- Categories -->
+  <div class="section">
+    <div class="container">
+      <div class="row">
+        <div class="col-md-12"><div class="section-title"><h3 class="title">Shop by Categories</h3></div></div>
+        <div class="col-md-12">
+          <div id="category-container" class="products-slick" data-nav="#slick-nav-cat"></div>
+          <div id="slick-nav-cat" class="products-slick-nav"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- New Products -->
+  <div class="section">
+    <div class="container">
+      <div class="row">
+        <div class="col-md-12"><div class="section-title"><h3 class="title">New Products</h3></div></div>
+        <div class="col-md-12">
+          <div id="product-container" class="products-slick" data-nav="#slick-nav-1"></div>
+          <div id="slick-nav-1" class="products-slick-nav"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Premium Products -->
+  <div class="section">
+    <div class="container">
+      <div class="row">
+        <div class="col-md-12"><div class="section-title"><h3 class="title">Premium Products</h3></div></div>
+        <div class="col-md-12">
+          <div id="premium-container" class="products-slick" data-nav="#slick-nav-premium"></div>
+          <div id="slick-nav-premium" class="products-slick-nav"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="footer-placeholder"></div>
+
+  <!-- Scripts -->
+  <script src="js/jquery.min.js"></script>
+  <script src="js/bootstrap.min.js"></script>
+  <script src="js/slick.min.js"></script>
+  <script src="js/jquery.zoom.min.js"></script>
+  <script src="js/navigation.js"></script>
+  <script src="js/main1.js"></script>
+  <script src="js/profileBehviour.js"></script>
+
+
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      fetch("http://localhost:8080/api/products/all")
+        .then(r => r.json())
+        .then(products => {
+          const newCont = document.getElementById("product-container");
+          const premCont = document.getElementById("premium-container");
+          if (!Array.isArray(products)) return;
+
+          products.forEach(p => {
+            const hasSheet = !!p.datasheetUrl;
+            const card = `
+              <div class="product modern-product-card">
+                <div class="product-top-link">
+                  <div class="product-img"><img src="${p.imageUrl || './img/placeholder.png'}" alt="${p.name}" onerror="this.src='./img/placeholder.png'"></div>
+                  <div class="product-body">
+                    <p class="product-category">${p.categoryName || 'Category'}</p>
+                    <h3 class="product-name">${p.name}</h3>
+                    <h4 class="product-price">₹${p.price?.toFixed(2) || '0.00'}</h4>
+                  </div>
+                </div>
+                <div class="product-action d-flex flex-column gap-1">
+                  ${hasSheet ? `<a href="${p.datasheetUrl}" target="_blank" class="btn btn-sm btn-outline-primary">
+                    <i class="fa fa-file-pdf-o"></i> Download Datasheet</a>` : 
+                    `<button class="btn btn-sm btn-secondary" disabled>
+                    <i class="fa fa-file-pdf-o"></i> No Datasheet</button>`}
+                  <button class="btn btn-sm btn-success customize-product" data-product='${JSON.stringify(p)}' data-toggle="modal" data-target="#customizeModal">
+                    <i class="fa fa-cog mr-1"></i> Customize</button>
+                </div>
+              </div>`;
+            (p.price > 1000 ? premCont : newCont).insertAdjacentHTML("beforeend", card);
+          });
+
+          $('.products-slick').slick('refresh');
+        })
+        .catch(err => console.error("Product load error", err));
+
+      fetch("http://localhost:8080/api/categories")
+        .then(r => r.json())
+        .then(cats => {
+          const catCont = document.getElementById("category-container");
+          if (!Array.isArray(cats)) return;
+          cats.forEach(cat => {
+            catCont.insertAdjacentHTML("beforeend", `
+              <a href="store.html?categoryId=${cat.id}" class="shop d-block text-reset">
+                <div class="shop-img"><img src="${cat.imageUrl || './img/placeholder.png'}" alt="${cat.name}"></div>
+                <div class="shop-body">
+                  <h3>${cat.name}</h3>
+                  <span class="cta-btn">Explore <i class="fa fa-arrow-circle-right"></i></span>
+                </div>
+              </a>`);
+          });
+
+          $('.products-slick').slick('refresh');
+        })
+        .catch(err => console.error("Category load error", err));
+    });
+
+    $(function () {
+      $("#header-placeholder").load("header.html", () => FrontendHeader?.init?.());
+      $("#footer-placeholder").load("footer.html");
+    });
+  </script>
+
+  <!-- Customize Modal -->
+  <div class="modal fade" id="customizeModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-md" role="document">
+      <div class="modal-content p-3">
+        <div class="modal-header">
+          <h5 class="modal-title">Customize Product</h5>
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+        </div>
+        <div class="modal-body">
+          <p><strong id="c-prod-name"></strong></p>
+          <div id="c-specs-container"></div>
+          <div class="form-group">
+            <label>Quantity</label>
+            <input id="c-qty" type="number" class="form-control" value="1" min="1">
+          </div>
+          <div class="form-group">
+            <label>Notes</label>
+            <textarea id="c-notes" class="form-control" placeholder="Optional notes..."></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-primary" id="c-add-btn">Add to Cart</button>
+          <button class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let selectedProduct = null;
+
+    $('#customizeModal').on('show.bs.modal', e => {
+      selectedProduct = JSON.parse($(e.relatedTarget).attr('data-product'));
+      $('#c-prod-name').text(selectedProduct.name);
+      $('#c-qty').val(1);
+      $('#c-notes').val('');
+      const container = $('#c-specs-container').empty();
+
+      const specMap = {};
+      selectedProduct.specifications?.forEach(s => {
+        if (!specMap[s.key]) specMap[s.key] = new Set();
+        specMap[s.key].add(s.value);
+      });
+
+      Object.entries(specMap).forEach(([key, values]) => {
+        container.append(`
+          <div class="form-group">
+            <label>${key}</label>
+            <select class="form-control spec-selector" data-key="${key}">
+              ${Array.from(values).map(val => `<option value="${val}">${val}</option>`).join('')}
+            </select>
+          </div>
+        `);
+      });
+    });
+
+    $('#c-add-btn').click(() => {
+      const token = localStorage.getItem('userToken');
+      if (!token) {
+        alert("⚠ Please login to add items to your cart.");
+        return;
+      }
+
+      const qty = Math.max(1, parseInt($('#c-qty').val()));
+      const notes = $('#c-notes').val().trim();
+      const specs = [];
+
+      $('.spec-selector').each(function () {
+        specs.push({ key: $(this).data('key'), value: $(this).val() });
+      });
+
+      const payload = {
+        productId: selectedProduct.id,
+        quantity: qty,
+        notes,
+        specifications: specs
+      };
+
+      fetch('http://localhost:8080/api/cart', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + token
+        },
+        body: JSON.stringify(payload)
+      })
+      .then(res => res.text())
+      .then(msg => {
+        $('#customizeModal').modal('hide');
+        $('body').removeClass('modal-open');
+        $('.modal-backdrop').remove();
+        alert("✅ " + msg);
+      })
+      .catch(err => {
+        console.error('❌ Error:', err);
+        alert("❌ Failed to add item to cart.");
+      });
+    });
+  </script>
+</body>
+</html>

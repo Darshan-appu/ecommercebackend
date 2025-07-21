@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Categories | E-commerce Admin</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"/>
+
+  <link rel="stylesheet" href="css/style.css"/>
+    <style>
+    .error-msg {
+    color: red;
+    font-size: 12px;
+    margin-top: 4px;
+    display: none;
+  }
+    .form-text {
+    color: #6c757d;
+    font-size: 12px;
+    margin-top: 2px;
+  }
+    .modal {
+        display: none; /* Hidden by default */
+        position: fixed; /* Stay in place */
+        z-index: 1000; /* Sit on top */
+        left: 0;
+        top: 0;
+        width: 100%; /* Full width */
+        height: 100%; /* Full height */
+        overflow: auto; /* Enable scroll if needed */
+        background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+        justify-content: center; /* Center horizontally */
+        align-items: center; /* Center vertically */
+    }
+
+    .modal-content {
+        background-color: #fefefe;
+        margin: auto;
+        padding: 20px;
+        border: 1px solid #888;
+        width: 80%; /* Could be more specific like max-width: 500px; */
+        box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2), 0 6px 20px 0 rgba(0,0,0,0.19);
+        animation-name: animatetop;
+        animation-duration: 0.4s
+    }
+
+    /* Add Animation */
+    @keyframes animatetop {
+        from {top: -300px; opacity: 0}
+        to {top: 0; opacity: 1}
+    }
+
+    .close {
+        color: #aaa;
+        float: right;
+        font-size: 28px;
+        font-weight: bold;
+    }
+
+    .close:hover,
+    .close:focus {
+        color: black;
+        text-decoration: none;
+        cursor: pointer;
+    }
+
+    .modal-header {
+        padding: 2px 16px;
+        background-color: #f2f2f2; /* Light background for header */
+        color: #333;
+        border-bottom: 1px solid #ddd;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 15px;
+    }
+
+    .modal-body {
+        padding: 2px 16px;
+    }
+
+    .modal-footer {
+        padding: 10px 16px;
+        background-color: #f2f2f2; /* Light background for footer */
+        border-top: 1px solid #ddd;
+        text-align: right;
+        margin-top: 15px;
+    }
+
+    /* Basic form styling (adjust as per your existing style.css) */
+    .form-group {
+        margin-bottom: 15px;
+    }
+    .form-control {
+        width: 100%;
+        padding: 8px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        box-sizing: border-box; /* Include padding in width */
+    }
+    .form-control-file {
+        display: block; /* Make file input take full width */
+        margin-top: 5px;
+    }
+    .btn {
+        padding: 8px 15px;
+        border-radius: 4px;
+        cursor: pointer;
+        border: none;
+    }
+    .btn-primary {
+        background-color: #007bff;
+        color: white;
+    }
+    .btn-success {
+        background-color: #28a745;
+        color: white;
+    }
+    .btn-danger {
+        background-color: #dc3545;
+        color: white;
+    }
+    .btn-info {
+        background-color: #17a2b8;
+        color: white;
+    }
+    .btn-warning {
+        background-color: #ffc107;
+        color: #212529;
+    }
+    .status {
+        display: inline-block;
+        padding: .25em .4em;
+        font-size: 75%;
+        font-weight: 700;
+        line-height: 1;
+        text-align: center;
+        white-space: nowrap;
+        vertical-align: baseline;
+        border-radius: .25rem;
+    }
+    .status.active {
+        color: #fff;
+        background-color: #28a745; /* Green */
+    }
+    .status.inactive {
+        color: #fff;
+        background-color: #6c757d; /* Gray */
+    }
+  </style>
+</head>
+<body>
+  <div id="sidebar-placeholder"></div>
+
+  <div class="main">
+    <div id="top-navbar-placeholder"></div>
+
+    <div class="content">
+      <div class="page-header">
+        <h2>Categories Management</h2>
+        <button class="btn btn-primary" data-toggle="modal" data-target="#addCategoryModal">
+          <i class="fas fa-plus"></i> Add Category
+        </button>
+      </div>
+
+      <div id="alertContainer"></div>
+
+      <div class="card">
+        <div class="card-header">
+          <h3>All Categories</h3>
+        </div>
+        <div class="table-responsive">
+          <table id="categoriesTable">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Slug</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="modal" id="addCategoryModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>Add New Category</h3>
+        <span class="close" onclick="document.getElementById('addCategoryModal').style.display='none'">&times;</span>
+      </div>
+      <div class="modal-body">
+        <form id="addCategoryForm" enctype="multipart/form-data">
+          <div class="form-group">
+            <label for="categoryName">Category Name</label>
+            <input type="text" id="categoryName" class="form-control" required>
+            <small class="form-text">Max 30 characters only.</small>
+            <div id="categoryNameError" class="error-msg"></div>
+          </div>
+          <div class="form-group">
+            <label for="categorySlug">Slug</label>
+            <input type="text" id="categorySlug" class="form-control">
+          </div>
+          <div class="form-group">
+            <label for="categoryDescription">Description</label>
+            <textarea id="categoryDescription" class="form-control" rows="4"></textarea>
+            <small class="form-text">Max 100 words.</small>
+            <div id="categoryDescriptionError" class="error-msg"></div>
+          </div>
+          <div class="form-group">
+            <label for="categoryStatus">Status</label>
+            <select id="categoryStatus" class="form-control">
+              <option value="Active">Active</option>
+              <option value="Inactive">Inactive</option>
+            </select>
+            <small class="form-text">Please choose a status.</small>
+            <div id="categoryStatusError" class="error-msg"></div>
+          </div>
+          <div class="form-group">
+            <label for="categoryImage">Image</label>
+            <input type="file" id="categoryImage" accept="image/*" class="form-control" />
+            <small class="form-text">Max size: 100 KB | Ratio: 1:1 (Square)</small>
+            <div id="categoryImageError" class="error-msg"></div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn" onclick="document.getElementById('addCategoryModal').style.display='none'">Cancel</button>
+        <button type="button" class="btn btn-primary" id="saveCategoryBtn">Save Category</button>
+      </div>
+    </div>
+  </div>
+  <div class="modal" id="editCategoryModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>Edit Category</h3>
+        <span class="close" onclick="document.getElementById('editCategoryModal').style.display='none'">&times;</span>
+      </div>
+      <div class="modal-body">
+        <form id="editCategoryForm">
+          <input type="hidden" id="editCategoryId">
+          <div class="form-group">
+            <label for="editCategoryName">Category Name</label>
+            <input type="text" id="editCategoryName" class="form-control" required>
+            <div id="editCategoryNameError" class="error-msg"></div>
+          </div>
+          <div class="form-group">
+            <label for="editCategorySlug">Slug</label>
+            <input type="text" id="editCategorySlug" class="form-control">
+          </div>
+          <div class="form-group">
+            <label for="editCategoryDescription">Description</label>
+            <textarea id="editCategoryDescription" class="form-control" rows="4"></textarea>
+          <div id="editCategoryDescriptionError" class="error-msg"></div>
+          </div>
+          <div class="form-group">
+            <label for="editCategoryStatus">Status</label>
+            <select id="editCategoryStatus" class="form-control">
+              <option value="Active">Active</option>
+              <option value="Inactive">Inactive</option>
+            </select>
+            <div id="categoryStatusError" class="error-msg"></div>
+          </div>
+          <div class="form-group">
+            <label for="editCategoryImage">Update Image (optional):</label>
+            <input type="file" id="editCategoryImage" accept="image/*" class="form-control" />
+            <small class="form-text">Max size: 100 KB | Ratio: 1:1 (Square)</small>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn" onclick="document.getElementById('editCategoryModal').style.display='none'">Cancel</button>
+        <button type="button" class="btn btn-primary" id="updateCategoryBtn">Update Category</button>
+      </div>
+    </div>
+  </div>
+  <script src="js/main.js"></script>
+  <script src="js/categories.js"></script>
+  <script src="js/sidebar.js"></script>
+  <script src="js/topnav.js"></script>
+  <script src="js/restrction.js"></script>
+</body>
+</html>
