@@ -151,7 +151,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   try {
-    const res = await fetch('http://localhost:8080/api/users/profile', {
+    const res = await fetch('https://ecommercebackend-i16e.onrender.com/api/users/profile', {
       headers: { 'Authorization': `Bearer ${token}` }
     });
 

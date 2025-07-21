@@ -1,6 +1,6 @@
 document.addEventListener('DOMContentLoaded', function() {
     // Base URL for your API
-    const API_BASE_URL = 'http://localhost:8080/api/products/admin'; // Make sure this matches your Spring Boot app's port
+    const API_BASE_URL = 'https://ecommercebackend-i16e.onrender.com/api/products/admin'; // Make sure this matches your Spring Boot app's port
 
     // Load categories for dropdowns (assuming categories are still managed locally or via another API)
     loadCategories();

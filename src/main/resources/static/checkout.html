@@ -297,7 +297,7 @@
                 }
             } else {
                 try {
-                    const response = await fetch('http://localhost:8080/api/cart', {
+                    const response = await fetch('https://ecommercebackend-i16e.onrender.com/api/cart', {
                         headers: {
                             'Authorization': 'Bearer ' + token
                         }
@@ -420,7 +420,7 @@
             };
 
             try {
-                const res = await fetch('http://localhost:8080/api/orders', {
+                const res = await fetch('https://ecommercebackend-i16e.onrender.com/api/orders', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -438,7 +438,7 @@
                 alert("✅ Order placed successfully! Order ID: " + data.id);
 
                 if (!isBuyNowMode) {
-                    await fetch('http://localhost:8080/api/cart/clear', {
+                    await fetch('https://ecommercebackend-i16e.onrender.com/api/cart/clear', {
                         method: 'DELETE',
                         headers: {
                             'Authorization': 'Bearer ' + token

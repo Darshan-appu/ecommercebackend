@@ -21,7 +21,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const cartModal = document.getElementById("cartModal");
     if (cartModal) {
-        $(cartModal).on('hidden.bs.modal', function () {
+        $(cartModal).on('hidden.bs.modal', function() {
             updateCartCounts();
         });
     }
@@ -45,11 +45,11 @@ function loadCartItems() {
         return;
     }
 
-    fetch("http://localhost:8080/api/cart", {
-        headers: {
-            Authorization: `Bearer ${token}`,
-        },
-    })
+    fetch("https://ecommercebackend-i16e.onrender.com/api/cart", {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        })
         .then((res) => {
             if (!res.ok) {
                 if (res.status === 401) {
@@ -151,11 +151,11 @@ function updateCartCounts() {
         return;
     }
 
-    fetch("http://localhost:8080/api/cart", {
-        headers: {
-            Authorization: `Bearer ${token}`,
-        },
-    })
+    fetch("https://ecommercebackend-i16e.onrender.com/api/cart", {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        })
         .then(res => res.json())
         .then(cartItems => {
             let totalQuantity = 0;
@@ -190,12 +190,12 @@ function deleteCartItem(cartItemId) {
 
     if (!confirm("Are you sure you want to remove this item from your cart?")) return;
 
-    fetch(`http://localhost:8080/api/cart/${cartItemId}`, {
-        method: 'DELETE',
-        headers: {
-            Authorization: `Bearer ${token}`,
-        },
-    })
+    fetch(`https://ecommercebackend-i16e.onrender.com/api/cart/${cartItemId}`, {
+            method: 'DELETE',
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        })
         .then(res => {
             if (res.ok) {
                 alert("Item removed from cart!");
@@ -214,12 +214,12 @@ function clearCartItems() {
 
     if (!confirm("Are you sure you want to clear your entire cart?")) return;
 
-    fetch("http://localhost:8080/api/cart/clear", {
-        method: 'DELETE',
-        headers: {
-            Authorization: `Bearer ${token}`,
-        },
-    })
+    fetch("https://ecommercebackend-i16e.onrender.com/api/cart/clear", {
+            method: 'DELETE',
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        })
         .then(res => {
             if (res.ok) {
                 alert("Cart cleared successfully!");
@@ -247,11 +247,11 @@ function updateCartItemQuantity(cartItemId, newQuantity) {
         return;
     }
 
-    fetch(`http://localhost:8080/api/cart`, {
-        headers: {
-            Authorization: `Bearer ${token}`,
-        },
-    })
+    fetch(`https://ecommercebackend-i16e.onrender.com/api/cart`, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        })
         .then(res => {
             if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
             return res.json();
@@ -270,7 +270,7 @@ function updateCartItemQuantity(cartItemId, newQuantity) {
                 specifications: transformedSpecifications
             };
 
-            return fetch(`http://localhost:8080/api/cart/${cartItemId}`, {
+            return fetch(`https://ecommercebackend-i16e.onrender.com/api/cart/${cartItemId}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',

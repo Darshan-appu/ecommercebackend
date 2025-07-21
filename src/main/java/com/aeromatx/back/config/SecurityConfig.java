@@ -67,7 +67,7 @@ public class SecurityConfig {
             "http://localhost:5500", // Direct browser run
             "http://localhost:3000", // React
             "http://localhost:4200", // Angular
-            "https://your-production-domain.com" // Replace with prod URL
+            "https://ecommercebackend-i16e.onrender.com" // Replace with prod URL
         ));
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("*"));

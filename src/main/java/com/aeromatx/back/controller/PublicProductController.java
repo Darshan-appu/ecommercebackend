@@ -16,7 +16,7 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/products")
-@CrossOrigin(origins = {"http://localhost:8080", "http://127.0.0.1:5500"})
+@CrossOrigin(origins = {"http://localhost:8080", "http://127.0.0.1:5500","https://ecommercebackend-i16e.onrender.com"})
 public class PublicProductController {
 
     @Autowired

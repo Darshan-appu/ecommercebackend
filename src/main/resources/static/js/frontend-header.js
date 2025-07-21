@@ -11,7 +11,7 @@
 
     async function loadFrontendCategories() {
         try {
-            const response = await fetch('http://localhost:8080/api/categories');
+            const response = await fetch('https://ecommercebackend-i16e.onrender.com/api/categories');
             if (!response.ok) {
                 throw new Error(`HTTP error! Status: ${response.status}`);
             }

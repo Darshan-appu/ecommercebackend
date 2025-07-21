@@ -55,7 +55,7 @@
       const categoryId = urlParams.get("categoryId");
       if (!categoryId) return;
 
-      fetch(`http://localhost:8080/api/products/by-category/${categoryId}`)
+      fetch(`https://ecommercebackend-i16e.onrender.com/api/products/by-category/${categoryId}`)
         .then(res => res.json())
         .then(products => {
           const grouped = {};
@@ -195,7 +195,7 @@
     specifications: specs
   };
 
-  fetch('http://localhost:8080/api/cart', {
+  fetch('https://ecommercebackend-i16e.onrender.com/api/cart', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',

@@ -18,7 +18,8 @@ public class WebConfig implements WebMvcConfigurer {
                 .allowedOrigins(
                     "http://127.0.0.1:5500", // Example: VS Code Live Server
                     "http://localhost:3000",  // Example: React Dev Server
-                    "http://localhost:4200"  // Example: Angular Dev Server
+                    "http://localhost:4200",  // Example: Angular Dev Server
+                    "https://ecommercebackend-i16e.onrender.com"
                     
                     // Add your actual frontend URLs here.
                     // For production, specify exact domains, not '*'

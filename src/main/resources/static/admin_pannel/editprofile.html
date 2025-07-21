@@ -91,7 +91,7 @@ const loginRedirect = isAdminPage ? '/admin_pannel/admin-login.html' : '/login.h
 
 async function loadUserProfile() {
   try {
-    const res = await fetch('http://localhost:8080/api/users/profile', {
+    const res = await fetch('https://ecommercebackend-i16e.onrender.com/api/users/profile', {
       headers: { 'Authorization': `Bearer ${token}` }
     });
     if (!res.ok) throw new Error('Unauthorized');
@@ -119,7 +119,7 @@ document.getElementById('editProfileForm').addEventListener('submit', async func
     temporaryAddress: document.getElementById('temporaryAddress').value
   };
 
-  const res = await fetch('http://localhost:8080/api/users/profile', {
+  const res = await fetch('https://ecommercebackend-i16e.onrender.com/api/users/profile', {
     method: 'PUT',
     headers: {
       'Authorization': `Bearer ${token}`,
