@@ -28,26 +28,38 @@ function loadLayout() {
 }
 
 // Function to highlight the current page in navigation
-function highlightCurrentPage(currentPage) {
-    // Default to index.html if on the root path
-    if (currentPage === '' || currentPage === '/') {
-        currentPage = 'index.html';
-    }
+function highlightCurrentPageWhenReady() {
+    const checkInterval = setInterval(() => {
+        const navLinks = document.querySelectorAll('#main-nav-category-list a');
 
-    // Remove active class from all nav links
-    const navLinks = document.querySelectorAll('.navbar-nav .nav-item.nav-link');
-    navLinks.forEach(link => {
-        link.classList.remove('active');
-    });
+        if (navLinks.length > 0) {
+            clearInterval(checkInterval); // ✅ stop once loaded
 
-    // Add active class to the current page's nav link
-    navLinks.forEach(link => {
-        const href = link.getAttribute('href');
-        if (href === currentPage) {
-            link.classList.add('active');
+            const currentUrl = new URL(window.location.href);
+            const currentPage = currentUrl.pathname.split("/").pop();
+            const currentCategoryId = currentUrl.searchParams.get("categoryId");
+
+            navLinks.forEach(link => {
+                link.classList.remove('active');
+
+                const linkUrl = new URL(link.href, window.location.origin);
+                const linkPage = linkUrl.pathname.split("/").pop();
+                const linkCategoryId = linkUrl.searchParams.get("categoryId");
+
+                const isMatch =
+                    currentPage === linkPage &&
+                    (linkCategoryId === currentCategoryId || (!linkCategoryId && !currentCategoryId));
+
+                if (isMatch) {
+                    link.classList.add('active');
+                }
+            });
         }
-    });
+    }, 200); // check every 200ms
 }
+highlightCurrentPageWhenReady();
+
+
 
 // Function to update cart badge count
 function updateCartBadge() {
