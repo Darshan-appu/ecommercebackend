@@ -1,3 +1,5 @@
+
+
 package com.aeromatx.back.controller;
 
 import com.aeromatx.back.dto.product.CategoryDTO;
@@ -12,21 +14,14 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.http.MediaType;
-
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
-import java.util.UUID;
 import java.util.Map;
-
 
 @RestController
 @RequestMapping("/api/categories")
-@CrossOrigin(origins = {"http://localhost:8080", "http://127.0.0.1:5500","https://ecommercebackend-i16e.onrender.com"})
+@CrossOrigin(origins = {"http://localhost:8080", "http://127.0.0.1:5500", "https://ecommercebackend-i16e.onrender.com"})
 public class CategoryController {
 
     @Autowired
@@ -35,13 +30,19 @@ public class CategoryController {
     @Autowired
     private CategoryRepository categoryRepository;
 
-    @PostMapping(value = "/admin", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Category> createCategory(@RequestBody Category category) {
+    @Autowired
+    private CloudinaryService cloudinaryService;
+
+    // <-- removed 'consumes' so charset variants are accepted
+    @PostMapping("/admin")
+    public ResponseEntity<?> createCategory(@RequestBody Category category) {
+        // optional: check duplicate name if you have a service method
+        if (category.getName() != null && categoryService.existsByName(category.getName())) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(Map.of("error", "Category name already exists"));
+        }
         Category createdCategory = categoryService.createCategory(category);
         return new ResponseEntity<>(createdCategory, HttpStatus.CREATED);
     }
-
-    
 
     @GetMapping("/admin/all")
     public ResponseEntity<List<CategoryDTO>> getAllCategoriesDTO() {
@@ -77,43 +78,47 @@ public class CategoryController {
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
-    // ✅ Upload category image with cleaned filename
-    @Autowired
-private CloudinaryService cloudinaryService;
+    @PostMapping(value="/admin/{id}/image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<?> uploadCategoryImage(
+            @PathVariable Long id,
+            @RequestParam("image") MultipartFile file) throws IOException {
 
-// @PostMapping(value="/admin/{id}/image",consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-// public ResponseEntity<?> uploadCategoryImage(
-//         @PathVariable Long id,
-//         @RequestParam("image") MultipartFile file) throws IOException {
+        String imageUrl = cloudinaryService.uploadFile(file, "categories");
 
-//     String imageUrl = cloudinaryService.uploadFile(file, "categories");
+        Category category = categoryRepository.findById(id)
+            .orElseThrow(() -> new RuntimeException("Category not found"));
 
-//     Category category = categoryRepository.findById(id)
-//         .orElseThrow(() -> new RuntimeException("Category not found"));
+        category.setImageUrl(imageUrl);
+        categoryRepository.save(category);
 
-//     category.setImageUrl(imageUrl);
-//     categoryRepository.save(category);
+        return ResponseEntity.ok(Map.of("url", imageUrl));
+    }
 
-//     return ResponseEntity.ok(Map.of("url", imageUrl));
-// }
+    @PutMapping(value = "/admin/{id}/image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<?> updateCategoryImage(
+            @PathVariable Long id,
+            @RequestParam("image") MultipartFile file) throws IOException {
 
-@PostMapping(value="/admin/{id}/image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-public ResponseEntity<?> uploadCategoryImage(
-        @PathVariable Long id,
-        @RequestParam("image") MultipartFile file) throws IOException {
+        String newImageUrl = cloudinaryService.uploadFile(file, "categories");
 
-    String imageUrl = cloudinaryService.uploadFile(file, "categories");
+        Category category = categoryRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Category not found"));
 
-    Category category = categoryRepository.findById(id)
-        .orElseThrow(() -> new RuntimeException("Category not found"));
+        // optionally delete old image: cloudinaryService.deleteFileFromUrl(category.getImageUrl());
 
-    category.setImageUrl(imageUrl);
-    categoryRepository.save(category);
+        category.setImageUrl(newImageUrl);
+        categoryRepository.save(category);
 
-    return ResponseEntity.ok(Map.of("url", imageUrl));
-}
-
-
-
-
+        return ResponseEntity.ok(Map.of(
+                "message", "Category image updated successfully",
+                "url", newImageUrl
+        ));
+    }
+    //for public category access
+    @GetMapping("/{id}")
+    public ResponseEntity<Category> getCategoryForFrontend(@PathVariable Long id) {
+        return categoryRepository.findById(id)
+                .map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.notFound().build());
+    }
 }

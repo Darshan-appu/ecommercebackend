@@ -69,24 +69,47 @@ public class OtpService {
     @Value("${twilio.verify.sid}")
     private String verifySid;
 
+    // public void generateOtpForMobile(String mobile) {
+    //     if (mobile == null || mobile.isBlank()) return;
+
+    //     mobile = formatMobile(mobile);
+    //     try {
+    //         Verification verification = Verification.creator(
+    //                 verifySid,
+    //                 mobile,
+    //                 "sms"
+    //         ).create();
+
+    //         System.out.println("OTP sent to: " + mobile + ", Status: " + verification.getStatus());
+    //         //only for testing purpose
+    //         System.out.println("📢 DEV MODE OTP for " + mobile + " = " + simulatedOtp + " (Also sent via Twilio)");
+    //         //end only for testing purpose
+    //     } catch (Exception e) {
+    //         System.err.println("Twilio send OTP failed: " + e.getMessage());
+    //     }
+
+    //     printAllOtps();
+    // }
+
+    //2nd one
     public void generateOtpForMobile(String mobile) {
-        if (mobile == null || mobile.isBlank()) return;
+    if (mobile == null || mobile.isBlank()) return;
 
-        mobile = formatMobile(mobile);
-        try {
-            Verification verification = Verification.creator(
-                    verifySid,
-                    mobile,
-                    "sms"
-            ).create();
+    mobile = formatMobile(mobile);
 
-            System.out.println("OTP sent to: " + mobile + ", Status: " + verification.getStatus());
-        } catch (Exception e) {
-            System.err.println("Twilio send OTP failed: " + e.getMessage());
-        }
+    try {
+        Verification verification = Verification.creator(
+                verifySid,
+                mobile,
+                "sms"
+        ).create();
 
-        printAllOtps();
+        System.out.println("✅ Twilio OTP sent to: " + mobile + ", Status: " + verification.getStatus());
+    } catch (Exception e) {
+        System.err.println("❌ Twilio send OTP failed: " + e.getMessage());
     }
+}
+
 
     public boolean verifyMobileOtp(String mobile, String otp) {
         if (mobile == null || otp == null || mobile.isBlank() || otp.isBlank()) return false;
@@ -98,6 +121,7 @@ public class OtpService {
             ).setTo(mobile).create();
 
             System.out.println("Verifying OTP for: " + mobile + ", Status: " + check.getStatus());
+            
             return "approved".equalsIgnoreCase(check.getStatus());
         } catch (Exception e) {
             System.err.println("Twilio OTP verification failed: " + e.getMessage());

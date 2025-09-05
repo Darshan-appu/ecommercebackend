@@ -24,7 +24,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/users")
-@CrossOrigin(origins = "https://ecommercebackend-i16e.onrender.com")
+@CrossOrigin(origins = {"https://ecommercebackend-i16e.onrender.com","http://localhost:8080"})
 public class UserController {
 
     private final UserService userService;

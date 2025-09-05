@@ -1,87 +1,135 @@
-// src/main/java/com/aeromatx/back/entity/Vendor.java
 package com.aeromatx.back.entity;
 
-import jakarta.persistence.*; // Using Jakarta Persistence API (JPA) for Spring Boot 3+
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import java.util.ArrayList;
 
-import java.time.LocalDate; // For date fields
+import com.aeromatx.back.enums.VendorStatus;
+import jakarta.persistence.*;
+import lombok.*;
+import java.util.List;
 
-// JPA Entity representing the 'vendors' table in the database
-@Entity // Marks this class as a JPA entity
-@Table(name = "vendors") // Specifies the table name in the database
-@Data // Lombok annotation to generate getters, setters, toString, equals, and hashCode
-@AllArgsConstructor // Lombok annotation to generate an all-args constructor
-@NoArgsConstructor // Lombok annotation to generate a no-args constructor
+@Entity
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class Vendor {
 
-    @Id // Marks this field as the primary key
-    @GeneratedValue(strategy = GenerationType.IDENTITY) // Auto-increments ID
-    private Long id; // Primary key for the vendor
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long vendorId;
 
-    // Company Contact Information
-    @Column(nullable = false) // Not null column
     private String businessName;
-    @Column(nullable = false)
-    private String companyAddress;
-    @Column(nullable = false)
-    private String city;
-    @Column(nullable = false)
-    private String state;
-    @Column(nullable = false)
-    private String zipCode;
-    private String website;
+
+    @Column(unique = true, nullable = false)
+    private String email;
+
+    private String password;
+
+    @Enumerated(EnumType.STRING)
+    private VendorStatus status;
+
+    private double ratings;
 
     // Point of Contact
-    @Column(nullable = false)
     private String firstName;
-    @Column(nullable = false)
     private String lastName;
-    @Column(nullable = false)
+    private String companyAddress;
+    private String city;
+    private String state;
+    private String zipCode;
     private String phoneDay;
     private String phoneEvening;
-    @Column(nullable = false, unique = true) // Email should be unique for each vendor
-    private String email;
-    @Column(nullable = false)
     private String position;
 
     // Company Overview
-    @Lob // For larger text fields like descriptions
-    @Column(nullable = false)
+    @Column(length = 2000)
     private String serviceDetails;
-    @Column(nullable = false)
-    private LocalDate establishmentDate; // Store as LocalDate for proper date handling
-    @Column(nullable = false)
-    private String serviceArea;
-    @Column(nullable = false)
-    private String businessType;
-    private Integer employeeCount; // Can be null
-    @Column(nullable = false)
-    private String insured; // "Yes" or "No"
-    @Column(nullable = false)
-    private String licensed; // "Yes" or "No"
-    private String licenseNumber; // Can be null
-    private String annualSales;   // Can be null
 
-    // Banking Information
-    @Column(nullable = false)
+    private String establishmentDate;
+    private String serviceArea;
+    private String businessType;
+    private boolean insured;
+    private boolean licensed;
+    private String licenseNumber;
+    private String annualSales;
+
+    // Banking Info
     private String bankName;
-    @Column(nullable = false)
     private String beneficiaryName;
-    @Column(nullable = false)
     private String accountNumber;
-    private String routingNumber; // Can be null
 
     // Certification
-    @Column(nullable = false)
-    private LocalDate submissionDate; // Store as LocalDate
-    @Column(nullable = false)
-    private String signature; // Storing typed name as signature
+    private String submissionDate;
+    private String signature;
 
-    // Admin/Internal fields
-    @Column(nullable = false)
-    private String status; // e.g., "Pending", "Approved", "Rejected"
-    @Column(nullable = false)
-    private String ratings; // Initial rating "0.0"
+    // Company Overview (used in profile)
+    @Column(length = 2000)
+    private String companyOverview;
+
+    // PAN number (used in profile)
+    private String panNumber;
+
+    // GST number (used in profile)
+    private String gstNumber;
+
+    // IFSC code (used in profile)
+    private String ifscCode;
+
+    // Profile picture URL or filename
+    private String profilePicture;
+
+    // Email verification
+    @Column(name = "email_verified")
+    private boolean emailVerified = false;
+
+    // ✅ Separate mobile verification flags
+    @Column(name = "phone_day_verified")
+    private boolean phoneDayVerified = false;
+
+    @Column(name = "phone_evening_verified")
+    private boolean phoneEveningVerified = false;
+
+    //for website
+    private String website;
+
+    // Vendor.java
+// @Enumerated(EnumType.STRING)
+// @Column(nullable = false)
+// private ERole role = ERole.ROLE_OEM; // default value
+
+@ManyToOne(fetch = FetchType.EAGER)
+@JoinColumn(name = "role_id", nullable = false)
+private Role role;
+
+
+
+
+    // Getters and Setters for custom fields
+    public boolean isEmailVerified() {
+        return emailVerified;
+    }
+
+    public void setEmailVerified(boolean emailVerified) {
+        this.emailVerified = emailVerified;
+    }
+
+    public boolean isPhoneDayVerified() {
+        return phoneDayVerified;
+    }
+
+    public void setPhoneDayVerified(boolean phoneDayVerified) {
+        this.phoneDayVerified = phoneDayVerified;
+    }
+
+    public boolean isPhoneEveningVerified() {
+        return phoneEveningVerified;
+    }
+
+    public void setPhoneEveningVerified(boolean phoneEveningVerified) {
+        this.phoneEveningVerified = phoneEveningVerified;
+    }
+
+    @OneToMany(mappedBy = "vendor", cascade = CascadeType.ALL, orphanRemoval = true)
+private List<Product> products = new ArrayList<>();
+
 }

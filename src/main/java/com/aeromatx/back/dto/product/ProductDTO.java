@@ -6,8 +6,8 @@ import java.util.List;
 import com.aeromatx.back.entity.Product;
 
 import lombok.*;
-import java.math.BigDecimal;
-import java.util.List;
+//import java.math.BigDecimal;
+//import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -19,6 +19,11 @@ public class ProductDTO {
     private BigDecimal price;
     private int stock;
     private Long subCategoryId;
+    private List<Long> applicationIds; // for POST/PUT
+private List<String> applicationNames; // for GET
+private Long vendorId;
+
+
     
 
     private List<SpecificationDTO> specifications;
@@ -45,6 +50,14 @@ public String getDatasheetUrl() { return datasheetUrl; }
     public void setSubCategoryId(Long subCategoryId) { this.subCategoryId = subCategoryId; }
     public void setSpecifications(List<SpecificationDTO> specifications) { this.specifications = specifications; }
     public void setDatasheetUrl(String datasheetUrl) { this.datasheetUrl = datasheetUrl; }
+
+    public Long getVendorId() {
+    return vendorId;
+}
+
+public void setVendorId(Long vendorId) {
+    this.vendorId = vendorId;
+}
 
     public static class SpecificationDTO {
         private String key;
@@ -83,5 +96,6 @@ public String getDatasheetUrl() { return datasheetUrl; }
 
     return dto;
 }
+
 
 }

@@ -17,6 +17,14 @@ public class ProductResponseDTO {
     private int stock;
     private String imageUrl;
     private String datasheetUrl;
+    private List<Long> applicationIds; // for POST/PUT
+private List<String> applicationNames; // for GET
+private Long vendorId;
+private String vendorName;
+//private CategoryDTO category;      // add this
+    //private SubCategoryDTO subCategory; // add this
+
+
 
 
     private String categoryName;

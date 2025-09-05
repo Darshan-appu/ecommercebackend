@@ -97,8 +97,17 @@ public class SecurityConfig {
                     "/header.html", "/footer.html",
                     "/api/subcategories/by-category/**"
                 ).permitAll()
+                    .requestMatchers(HttpMethod.GET, "/api/applications","/api/applications/**","/api/categories/**").permitAll()
+    .requestMatchers(HttpMethod.POST, "/api/applications").permitAll()
+    .requestMatchers(HttpMethod.PUT, "/api/applications/**").permitAll()
+.requestMatchers(HttpMethod.PATCH, "/api/applications/**").permitAll()
+.requestMatchers(HttpMethod.DELETE, "/api/applications/**").permitAll()
+.requestMatchers("/api/public/**").permitAll()
 
-                .requestMatchers(HttpMethod.POST, "/api/vendor/register").permitAll()
+
+
+                .requestMatchers(HttpMethod.POST, "/api/vendor/register","/api/vendor/login","/api/vendor/send-otp/**","/api/vendor/email-change/send-otp","/api/vendor/email-change/verify-otp").permitAll()
+                .requestMatchers(HttpMethod.PUT, "/api/vendor/verify/**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/vendor", "/api/vendor/{id}").permitAll()
                 .requestMatchers(HttpMethod.PUT, "/api/vendor/{id}").permitAll()
                 .requestMatchers(HttpMethod.DELETE, "/api/vendor/{id}").permitAll()

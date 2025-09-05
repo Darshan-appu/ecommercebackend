@@ -1,19 +1,22 @@
 package com.aeromatx.back.util;
 
 import com.aeromatx.back.security.UserDetailsImpl;
+import com.aeromatx.back.security.VendorDetailsImpl;
+
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import jakarta.servlet.http.HttpServletRequest;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Component;
 
 import java.security.Key;
 import java.util.Date;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Component
 public class JwtUtil {
@@ -26,16 +29,44 @@ public class JwtUtil {
     private int jwtExpirationMs;
 
     public String generateJwtToken(Authentication authentication) {
-        UserDetailsImpl userPrincipal = (UserDetailsImpl) authentication.getPrincipal();
+        Object principal = authentication.getPrincipal();
+
+        String role;
+        String email;
+        Long id;
+
+        if (principal instanceof UserDetailsImpl userPrincipal) {
+            role = userPrincipal.getAuthorities().stream()
+                    .map(GrantedAuthority::getAuthority)
+                    .findFirst()
+                    .orElse("ROLE_CUSTOMER");
+            email = userPrincipal.getEmail();
+            id = userPrincipal.getId();
+        } else if (principal instanceof VendorDetailsImpl vendorPrincipal) {
+            role = "ROLE_OEM";
+            email = vendorPrincipal.getUsername();
+            id = null; // Optional
+        } else {
+            throw new IllegalArgumentException("Unknown principal type");
+        }
 
         return Jwts.builder()
-                .setSubject(userPrincipal.getEmail()) // ✅ set email in sub
-                //.setSubject(userPrincipal.getUsername())
-                .claim("id", userPrincipal.getId())
-                .claim("email", userPrincipal.getEmail())
-                .claim("roles", userPrincipal.getAuthorities().stream()
-                        .map(role -> role.getAuthority()) // e.g., ROLE_ADMIN
-                        .collect(Collectors.toList()))
+                .setSubject(email)
+                .claim("role", role)
+                .claim("email", email)
+                .claim("id", id)
+                .setIssuedAt(new Date())
+                .setExpiration(new Date((new Date()).getTime() + jwtExpirationMs))
+                .signWith(key(), SignatureAlgorithm.HS256)
+                .compact();
+    }
+
+    // ✅ New method to directly generate vendor token with role
+    public String generateVendorToken(String email) {
+        return Jwts.builder()
+                .setSubject(email)
+                .claim("role", "ROLE_OEM")
+                .claim("email", email)
                 .setIssuedAt(new Date())
                 .setExpiration(new Date((new Date()).getTime() + jwtExpirationMs))
                 .signWith(key(), SignatureAlgorithm.HS256)
@@ -71,5 +102,14 @@ public class JwtUtil {
             logger.error("JWT claims string is empty: {}", e.getMessage());
         }
         return false;
+    }
+
+    public String extractUsernameFromRequest(HttpServletRequest request) {
+        String header = request.getHeader("Authorization");
+        if (header != null && header.startsWith("Bearer ")) {
+            String token = header.substring(7); // Remove "Bearer "
+            return getUserNameFromJwtToken(token);
+        }
+        throw new RuntimeException("JWT Token missing or malformed");
     }
 }
