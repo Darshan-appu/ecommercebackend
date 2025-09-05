@@ -20,7 +20,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/api/admin/vendors")
+@RequestMapping("/api/admin/vendorss")
 @RequiredArgsConstructor
 @CrossOrigin(origins = "*")
 public class AdminVendorController {

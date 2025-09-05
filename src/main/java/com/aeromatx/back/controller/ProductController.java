@@ -17,7 +17,7 @@ import java.io.IOException;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/products/admin")
+@RequestMapping("/api/products/adminn")
 @CrossOrigin(origins = {"http://localhost:8080", "http://127.0.0.1:5500","https://ecommercebackend-4zll.onrender.com"})
 public class ProductController {
 

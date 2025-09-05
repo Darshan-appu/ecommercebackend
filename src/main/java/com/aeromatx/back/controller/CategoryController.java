@@ -20,7 +20,7 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/api/categories")
+@RequestMapping("/api/categoriess")
 @CrossOrigin(origins = {"http://localhost:8080", "http://127.0.0.1:5500", "https://ecommercebackend-4zll.onrender.com"})
 public class CategoryController {
 

@@ -17,7 +17,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/api/applications")
+@RequestMapping("/api/applicationss")
 @Validated
 public class ApplicationController {
 

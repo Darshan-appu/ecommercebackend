@@ -23,7 +23,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/users")
+@RequestMapping("/api/userss")
 @CrossOrigin(origins = {"https://ecommercebackend-4zll.onrender.com","http://localhost:8080"})
 public class UserController {
 
