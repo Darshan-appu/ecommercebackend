@@ -151,7 +151,7 @@
 
             try {
                 displayMessage("Sending OTP...", "blue");
-                const res = await fetch("https://ecommercebackend-i16e.onrender.com/api/auth/register", {
+                const res = await fetch("https://ecommercebackend-4zll.onrender.com/api/auth/register", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify(payload)
@@ -183,7 +183,7 @@
 
             try {
                 displayMessage("Verifying OTP...", "blue");
-                const res = await fetch("https://ecommercebackend-i16e.onrender.com/api/auth/register/verify-otp", {
+                const res = await fetch("https://ecommercebackend-4zll.onrender.com/api/auth/register/verify-otp", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify(payload)

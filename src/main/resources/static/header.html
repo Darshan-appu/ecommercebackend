@@ -6,19 +6,18 @@
         /*----------------------------*\
          Top header
         \*----------------------------*/
+                        .active-category {
+                background-color: #189ab4;
+                color: #189ab4 !important;
+                border-radius: 2rem;
+                font-weight: bold;
+                }
 
         #top-header {
             padding-top: 10px;
             padding-bottom: 10px;
             background-color: #1989AC;
         }
-
-        .active-category {
-  background-color: #189ab4;
-  color: #189ab4 !important;
-  border-radius: 2rem;
-  font-weight: bold;
-}
 
         .header-links li {
             display: inline-block;
@@ -113,7 +112,7 @@
 
         .header-search form .search-btn {
             height: 40px;
-            width: 200px;
+            width: 100px;
             background: #1989AC;
             color: white;
             font-weight: 700;
@@ -597,8 +596,519 @@
         .cart-summary .text-right {
             font-weight: 500;
         }
+/* Reset / basic styles */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+  line-height: 1.5;
+}
+
+/* --- NAVIGATION BAR --- */
+#navigation {
+  background: #f9fafb;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+  padding: 0.75rem 0;
+  position: relative;
+  z-index: 1000;
+}
+
+#navigation .container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+}
+
+#navigation .nav-group {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+#home-nav a {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.5rem 1.25rem;
+  border-radius: 9999px;
+  background: #e5e7eb;
+  color: #111827;
+  font-weight: 600;
+  text-decoration: none;
+  transition: background 0.2s ease;
+}
+
+#home-nav a:hover {
+  background: #d1d5db;
+}
+
+/* --- CATEGORY TOGGLE BUTTON --- */
+.cat-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.625rem;
+  border: 0;
+  background: #111827;
+  color: #fff;
+  padding: 0.625rem 1.25rem;
+  border-radius: 9999px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.9375rem;
+  transition: background 0.2s ease, transform 0.1s ease;
+}
+
+.cat-toggle:hover {
+  background: #1f2937;
+}
+
+.cat-toggle:active {
+  transform: scale(0.98);
+}
+
+.cat-toggle .hamburger {
+  display: inline-flex;
+  flex-direction: column;
+  justify-content: center;
+  width: 18px;
+  height: 14px;
+  position: relative;
+}
+
+.cat-toggle .hamburger span {
+  position: absolute;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: currentColor;
+  transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+.cat-toggle .hamburger span:nth-child(1) { top: 0; }
+.cat-toggle .hamburger span:nth-child(2) { top: 6px; }
+.cat-toggle .hamburger span:nth-child(3) { top: 12px; }
+
+.cat-toggle[aria-expanded="true"] .hamburger span:nth-child(1) {
+  transform: translateY(6px) rotate(45deg);
+}
+.cat-toggle[aria-expanded="true"] .hamburger span:nth-child(2) {
+  opacity: 0;
+}
+.cat-toggle[aria-expanded="true"] .hamburger span:nth-child(3) {
+  transform: translateY(-6px) rotate(-45deg);
+}
+
+/* --- DRAWER --- */
+/* === Drawer Sidebar (Categories) === */
+.drawer {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 340px;
+  max-width: 90%;
+  height: 100vh;
+  background: linear-gradient(180deg, #f8fafc 0%, #edf2f7 100%);
+  box-shadow: -4px 0 16px rgba(0,0,0,0.15);
+  transform: translateX(100%);
+  transition: transform 0.3s ease;
+  z-index: 2000;
+  display: flex;
+  flex-direction: column;
+  border-left: none; /* removed blue strip */
+}
+
+.drawer.open { transform: translateX(0); }
+
+.drawer-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid #d1d5db;
+  background: #0d7ea2;
+  color: #fff;
+}
+
+.drawer-title {
+  font-weight: 600;
+  font-size: 18px;
+}
+
+.drawer-close {
+  border: none;
+  background: transparent;
+  font-size: 1.5rem;
+  color: #fff;
+  cursor: pointer;
+}
+
+/* === Category List === */
+.drawer-list {
+  list-style: none;
+  margin: 0;
+  padding: 1rem 0.5rem;
+  overflow-y: auto;
+  flex: 1;
+  font-size: 18px;
+}
+
+.drawer-list li a {
+  display: block;
+  padding: 0.8rem 1rem;
+  margin: 0.35rem 0.75rem;
+  color: #1e293b;
+  text-decoration: none;
+  font-weight: 700;
+  border-radius: 10px;
+  transition: all 0.3s ease;
+}
+
+/* Hover effect (same for all including HOME) */
+.drawer-list li a:hover {
+  background: #0d7ea2;
+  color: #fff;
+  transform: translateX(6px);
+  box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+}
+
+/* Remove special styling from HOME */
+.drawer-list li:first-child a {
+  background: transparent;
+  color: #1e293b;
+  font-weight: 600;
+}
+
+/* === Backdrop === */
+.drawer-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.45);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+  z-index: 1990;
+}
+.drawer-backdrop.show {
+  opacity: 1;
+  pointer-events: auto;
+  backdrop-filter: blur(3px);
+}
+
+/* === Categories Button === */
+.cat-btn {
+  background: #0d7ea2;
+  color: #fff;
+  font-weight: 600;
+  padding: 10px 18px;
+  border: none;
+  border-radius: 30px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 15px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+.cat-btn:hover {
+  background: #2563eb;
+  transform: scale(1.05);
+}
+.cat-btn i { font-size: 16px; }
 
 
+/* --- HIDE CATEGORIES FROM UI (Only show in Drawer) --- */
+#responsive-nav {
+  display: none;
+}
+
+/* Responsive adjustments */
+@media (max-width: 640px) {
+  #navigation .container {
+    padding: 0 1rem;
+  }
+  
+  .drawer {
+    width: 100%;
+    max-width: 100%;
+  }
+  
+  .cat-toggle {
+    padding: 0.5rem 1rem;
+  }
+  
+  #home-nav a {
+    padding: 0.5rem 1rem;
+  }
+}
+
+/* Animation enhancements */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.drawer-list li {
+  animation: fadeIn 0.3s ease forwards;
+  opacity: 0;
+}
+
+.drawer-list li:nth-child(1) { animation-delay: 0.05s; }
+.drawer-list li:nth-child(2) { animation-delay: 0.1s; }
+.drawer-list li:nth-child(3) { animation-delay: 0.15s; }
+.drawer-list li:nth-child(4) { animation-delay: 0.2s; }
+/* Add more as needed */
+/* Include in your HTML head:
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+*/
+
+/* Base Styles */
+.header-search {
+    display: flex;
+    height: 52px;
+    border-radius: 10px;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    border: 1x solid #f1f5f9;
+    font-family: 'Inter', 'Segoe UI', Roboto, sans-serif;
+    background-color: #fff;
+}
+
+/* Categories Button */
+.cat-toggle {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 0 20px;
+    background: #f8fafc;
+    color: #1e293b; /* Dark slate */
+    border: 1px solid #f1f5f9;
+    font-family: 'Inter', 'Segoe UI', Roboto, sans-serif;
+    font-weight: 600;
+    font-size: 30px;
+    letter-spacing: 0.3px;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border-right: none;
+    border-radius: 10px 0 0 10px;
+}
+
+.cat-toggle:hover {
+    background: #ebf5ff;
+    color: #2563eb;
+}
+
+.hamburger {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    width: 18px;
+    height: 14px;
+}
+
+.hamburger span {
+    display: block;
+    width: 100%;
+    height: 2px;
+    background: #4a5568;
+    transition: all 0.3s ease;
+}
+
+.cat-toggle:hover .hamburger span {
+    background: #2563eb;
+}
+
+/* Search Input */
+.search-form {
+    flex: 1;
+    display: flex;
+    border: 1px solid #f1f5f9;
+    border-left: none;
+    border-right: none;
+}
+
+.input {
+    flex: 1;
+    padding: 0 20px;
+    border: none;
+    font-size: 16px;
+    font-weight: 500;
+    outline: none;
+    background: transparent;
+    color: #1f2937;
+    font-family: 'Inter', 'Segoe UI', Roboto, sans-serif;
+    letter-spacing: 0.25px;
+}
+
+.input::placeholder {
+    color: #94a3b8;
+    font-weight: 500;
+    font-size: 15px;
+}
+
+/* Search Button */
+.search-btn {
+    width: 40px;
+    background: #4299e1;
+    border: 1px solid #f1f5f9;
+    border-left: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 0 10px 10px 0;
+}
+
+.search-btn:hover {
+    background: #2563eb;
+}
+
+.search-btn svg {
+    transition: transform 0.2s ease;
+    fill: #ffffff;
+}
+
+.search-btn:hover svg {
+    transform: scale(1.1);
+}
+
+/* Active States */
+.cat-toggle:active {
+    transform: translateY(1px);
+}
+
+.search-btn:active {
+    transform: scale(0.98);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .header-search {
+        flex-direction: column;
+        height: auto;
+        border-radius: 12px;
+    }
+
+    .cat-toggle {
+        width: 100%;
+        padding: 14px 20px;
+        border: 1px solid #f1f5f9;
+        border-bottom: none;
+        border-radius: 10px 10px 0 0;
+        justify-content: center;
+        font-size: 16px;
+    }
+
+    .search-form {
+        width: 100%;
+        border: 1px solid #f1f5f9;
+        border-top: none;
+        border-radius: 0 0 10px 10px;
+    }
+
+    .input {
+        padding: 14px 20px;
+        font-size: 16px;
+    }
+
+    .search-btn {
+        height: 42px;
+        border-left: 1px solid #f1f5f9;
+    }
+}
+    .header-search1 {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+
+    .header-search1 form {
+      display: flex;
+      width: 100%;
+      max-width: 700px;
+      border-radius: 40px;
+      overflow: hidden;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+
+    .cat-btn, 
+    .search-btn {
+      background: #0d7ea2;
+      color: #fff;
+      border: none;
+      padding: 12px 18px; /* smaller than before */
+      font-size: 15px;
+      font-weight: bold;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      white-space: nowrap;
+    }
+
+    .cat-btn {
+      border-radius: 40px 0 0 40px; /* rounded left */
+    }
+
+    .cat-btn i {
+      margin-right: 6px;
+    }
+
+    .search-btn {
+      border-radius: 0 40px 40px 0; /* rounded right */
+      font-size: 18px;
+      padding: 12px 20px; /* icon button */
+    }
+
+    .search-input {
+      flex: 1;
+      padding: 12px 16px;
+      border: none;
+      font-size: 16px;
+      outline: none;
+      text-align: justify;
+    }
+
+    .search-input::placeholder {
+      color: #9ca3af;
+    }
+
+    .cat-btn:hover, .search-btn:hover {
+      background: #0b6b8b;
+    }
+        .cat-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        
+        .cat-btn i {
+            font-size: 16px;
+        }
+
+        /* === ONE-LINE HEADER FIX (minimal overrides) === */
+        /* Make the header row a flex row and vertically center all columns */
+        #header .container .row {
+            display: flex;
+            align-items: center;
+        }
+        /* Give “grid” widths since Bootstrap CSS isn’t present here */
+        #header .container .row > .col-md-3 { flex: 0 0 25%; max-width: 25%; }
+        #header .container .row > .col-md-6 { flex: 0 0 50%; max-width: 50%; }
+
+        /* Remove extra vertical padding so items sit on the same line */
+        #header .header-ctn { padding: 0; display: flex; justify-content: flex-end; align-items: center; }
+        #header .header-search1 { padding: 0; display: flex; align-items: center; }
+        #header .header-logo { display: flex; align-items: center; }
     </style>
 
 </head>
@@ -637,18 +1147,44 @@
                             </a>
                         </div>
                     </div>
+                    
+  <!-- <div class="col-md-6">
+    <div class="header-search1">
+      <form> -->
+        <!-- Categories Button -->
+     <!-- <button id="catToggle"
+                            type="button"
+                            class="cat-btn"
+                            aria-expanded="false"
+                            aria-controls="categoryDrawer">
+                        <i class="fa fa-bars"></i> Categories
+                    </button> -->
 
-                    <div class="col-md-6">
-                        <div class="header-search">
-                            <form>
-                                <select id="search-category-select" class="input-select">
-                                    <option value="0">All Categories</option>
-                                </select>
-                                <input class="input" placeholder="Search here" />
-                                <button class="search-btn">Search</button>
-                            </form>
-                        </div>
-                    </div>
+        <!-- Search Input -->
+        <!-- <input class="search-input" placeholder="Search here for products..." /> -->
+
+        <!-- Search Button (Icon Only) -->
+        <!-- <button class="search-btn">
+          <i class="fa fa-search"></i>
+        </button>
+      </form>
+    </div>
+  </div> -->
+
+  <div class="col-md-6">
+  <div class="header-search1">
+    <form action="/search-results.html" method="GET">
+      <button id="catToggle" type="button" class="cat-btn" aria-expanded="false" aria-controls="categoryDrawer">
+        <i class="fa fa-bars"></i> Categories
+      </button>
+      <input class="search-input" name="q" placeholder="Search here for products" />
+      <button class="search-btn" type="submit">
+        <i class="fa fa-search"></i>
+      </button>
+    </form>
+  </div>
+</div>
+
 
                     <div class="col-md-3 clearfix">
                         <div class="header-ctn">
@@ -690,18 +1226,37 @@
             </div>
         </div>
     </header>
+        <div class="container">
+            
 
-    <div id="home-section">
-        <nav id="navigation">
-            <div class="container">
-                <div id="responsive-nav">
-                    <ul id="main-nav-category-list" class="main-nav nav navbar-nav">
-                        <li class="" id="home-nav"><a href="index.html">Home</a></li>
+            <!-- Hidden category list populated from backend -->
+            <div id="responsive-nav">
+                <ul id="main-nav-category-list" class="main-nav nav navbar-nav">
 
-                    </ul>
-                </div>
+                <li><a href="index.html"><span style="color: #4d889c;">🏠 HOME</span></a></li>
+                <!-- <li><a href="#">STRUCTURAL & COMPOSITE MATERIALS</a></li>
+                <li><a href="#">SATELLITE & RF COMMUNICATION SYSTEMS</a></li>
+                <li><a href="#">AUTOMOTIVE MECHANICAL SYSTEMS</a></li>
+                <li><a href="#">PRECISION MEDICAL DEVICES</a></li>
+                <li><a href="#">RARE-EARTH & INDUSTRIAL MAGNETS</a></li>
+                <li><a href="#">HIGH-PERFORMANCE CERAMIC SUBSTRATES</a></li> -->
+
+                </ul>
             </div>
-        </nav>
+            </div>
+            
+  <!-- Drawer -->
+  <aside id="categoryDrawer" class="drawer" aria-hidden="true">
+    <header class="drawer-header">
+      <h3>Categories</h3>
+      <button id="drawerClose" class="drawer-close" aria-label="Close">&times;</button>
+    </header>
+    <ul id="drawer-category-list" class="drawer-list"></ul>
+  </aside>
+
+  <!-- Backdrop -->
+  <div id="drawer-backdrop" class="drawer-backdrop" aria-hidden="true"></div>
+
     </div>
     <script src="js/jquery.min.js"></script>
     <script src="js/bootstrap.min.js"></script>
@@ -778,6 +1333,7 @@
             </div>
         </div>
     </div>
+    
 
     <script>
         // On page load, set user name
@@ -812,7 +1368,7 @@
 
         async function fetchCategories() {
             try {
-                const response = await fetch('https://ecommercebackend-i16e.onrender.com/api/categories');
+                const response = await fetch('https://ecommercebackend-4zll.onrender.com/api/categories');
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
@@ -874,6 +1430,317 @@
             sessionStorage.setItem('buyNowProduct', JSON.stringify({ product, quantity, specifications }));
             sessionStorage.removeItem('cartCheckout'); // Ensure regular cart checkout isn't triggered
             window.location.href = 'checkout.html?mode=buynow'; // Add a query parameter to indicate "buy now"
+        }
+          (function () {
+      const toggleBtn   = document.getElementById('catToggle');
+      const drawer      = document.getElementById('categoryDrawer');
+      const drawerClose = document.getElementById('drawerClose');
+      const backdrop    = document.getElementById('drawer-backdrop');
+      const mainList    = document.getElementById('main-nav-category-list');
+      const drawerList  = document.getElementById('drawer-category-list');
+
+      const syncDrawer = () => {
+        drawerList.innerHTML = '';
+        [...mainList.children].forEach(li => {
+          const clone = li.cloneNode(true);
+          drawerList.appendChild(clone);
+        });
+      };
+
+      const openDrawer = () => {
+        syncDrawer();
+        drawer.classList.add('open');
+        backdrop.classList.add('show');
+        toggleBtn.setAttribute('aria-expanded', 'true');
+        drawer.setAttribute('aria-hidden', 'false');
+      };
+
+      const closeDrawer = () => {
+        drawer.classList.remove('open');
+        backdrop.classList.remove('show');
+        toggleBtn.setAttribute('aria-expanded', 'false');
+        drawer.setAttribute('aria-hidden', 'true');
+        toggleBtn.focus();
+      };
+
+      toggleBtn.addEventListener('click', () => {
+        const expanded = toggleBtn.getAttribute('aria-expanded') === 'true';
+        expanded ? closeDrawer() : openDrawer();
+      });
+
+      drawerClose.addEventListener('click', closeDrawer);
+      backdrop.addEventListener('click', closeDrawer);
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') closeDrawer();
+      });
+    })();
+    (function () {
+  const NAV_ID = 'main-nav-category-list';
+  const APPS_HREF = '/applications'; // change to your real applications URL
+
+  function normalizeText(t) {
+    return (t || '').trim().replace(/\s+/g, ' ').toUpperCase();
+  }
+
+  function colorStringToRgbNoSpaces(s) {
+    return (s || '').replace(/\s+/g, '').toLowerCase();
+  }
+
+  function findHome(navList) {
+    if (!navList) return null;
+    const lis = Array.from(navList.querySelectorAll('li'));
+
+    // 1) exact text match (most likely)
+    let li = lis.find(li => normalizeText(li.textContent) === 'HOME');
+    if (li) return li;
+
+    // 2) anchor text match
+    li = lis.find(li => {
+      const a = li.querySelector('a');
+      return a && normalizeText(a.textContent) === 'HOME';
+    });
+    if (li) return li;
+
+    // 3) look for an element with inline color that matches typical green (#4d889c)
+    li = lis.find(li => {
+      const el = li.querySelector('a') || li;
+      // check inline style first
+      const inlineColor = el && (el.querySelector('span') || el).style.color;
+      if (inlineColor) {
+        const ic = colorStringToRgbNoSpaces(inlineColor);
+        if (ic === '#4d889c' || ic === 'rgb(77,136,156)') return true;
+      }
+      // check computed style
+      try {
+        const comp = window.getComputedStyle(el.querySelector('span') || el).color;
+        if (comp && colorStringToRgbNoSpaces(comp).includes('77,136,156')) return true;
+      } catch (e) {}
+      return false;
+    });
+    if (li) return li;
+
+    // 4) fallback: first item
+    return lis[0] || null;
+  }
+
+  function applicationsExists(navList) {
+    return Array.from(navList.querySelectorAll('li')).some(li => normalizeText(li.textContent) === 'APPLICATIONS');
+  }
+
+  function cloneHomeToApplications(navList, homeLi) {
+    const clone = homeLi.cloneNode(true);
+    // update the inner text and href
+    const a = clone.querySelector('a');
+    if (a) {
+      a.href = APPS_HREF;
+      const span = a.querySelector('span');
+      if (span) span.textContent = 'APPLICATIONS';
+      else a.textContent = 'APPLICATIONS';
+    } else {
+      // no anchor -> just replace text
+      clone.textContent = 'APPLICATIONS';
+    }
+    navList.appendChild(clone);
+  }
+
+  function copyStyleFromHomeToExistingApps(navList, homeLi) {
+    const appsLi = Array.from(navList.querySelectorAll('li')).find(li => normalizeText(li.textContent) === 'APPLICATIONS');
+    if (!appsLi) return;
+    // copy classnames and inline styles from homeLi and its <a> to apps element
+    appsLi.className = homeLi.className;
+    const homeA = homeLi.querySelector('a');
+    const appsA = appsLi.querySelector('a');
+    if (homeA && appsA) {
+      appsA.className = homeA.className;
+      appsA.style.cssText = homeA.style.cssText;
+      const homeSpan = homeA.querySelector('span'), appsSpan = appsA.querySelector('span');
+      if (homeSpan && appsSpan) appsSpan.style.cssText = homeSpan.style.cssText;
+    }
+  }
+
+  function tryEnsureApplications() {
+    const navList = document.getElementById(NAV_ID);
+    if (!navList) return false;
+
+    // if APPLICATIONS already exists, just copy styles so it looks like HOME
+    if (applicationsExists(navList)) {
+      const homeLi = findHome(navList);
+      if (homeLi) copyStyleFromHomeToExistingApps(navList, homeLi);
+      return true;
+    }
+
+    const homeLi = findHome(navList);
+    if (!homeLi) return false;
+
+    // clone home and append as APPLICATIONS
+    cloneHomeToApplications(navList, homeLi);
+    return true;
+  }
+
+  // Try immediately
+  if (tryEnsureApplications()) return;
+
+  // If not present yet, observe DOM changes until categories load (or timeout)
+  const observer = new MutationObserver((mutations, obs) => {
+    if (tryEnsureApplications()) {
+      obs.disconnect();
+    }
+  });
+  observer.observe(document.body, { childList: true, subtree: true });
+
+  // Safety timeout: stop observing after 12s
+  setTimeout(() => observer.disconnect(), 12000);
+})();
+        // Fix for categories button functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize the categories drawer functionality
+            initCategoriesDrawer();
+            
+            // Make sure the categories are loaded
+            fetchCategories();
+        });
+
+        function initCategoriesDrawer() {
+            const toggleBtn = document.getElementById('catToggle');
+            const drawer = document.getElementById('categoryDrawer');
+            const drawerClose = document.getElementById('drawerClose');
+            const backdrop = document.getElementById('drawer-backdrop');
+            
+            if (!toggleBtn || !drawer) {
+                console.error("Categories drawer elements not found");
+                return;
+            }
+            
+            // Open drawer function
+            function openDrawer() {
+                drawer.classList.add('open');
+                backdrop.classList.add('show');
+                toggleBtn.setAttribute('aria-expanded', 'true');
+                drawer.setAttribute('aria-hidden', 'false');
+                
+                // Ensure categories are loaded in the drawer
+                populateDrawerCategories();
+            }
+            
+            // Close drawer function
+            function closeDrawer() {
+                drawer.classList.remove('open');
+                backdrop.classList.remove('show');
+                toggleBtn.setAttribute('aria-expanded', 'false');
+                drawer.setAttribute('aria-hidden', 'true');
+            }
+            
+            // Toggle drawer on button click
+            toggleBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                const expanded = toggleBtn.getAttribute('aria-expanded') === 'true';
+                if (expanded) {
+                    closeDrawer();
+                } else {
+                    openDrawer();
+                }
+            });
+            
+            // Close drawer when clicking close button
+            if (drawerClose) {
+                drawerClose.addEventListener('click', closeDrawer);
+            }
+            
+            // Close drawer when clicking backdrop
+            if (backdrop) {
+                backdrop.addEventListener('click', closeDrawer);
+            }
+            
+            // Close drawer with Escape key
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') {
+                    closeDrawer();
+                }
+            });
+        }
+        
+        function populateDrawerCategories() {
+            const mainNavList = document.getElementById('main-nav-category-list');
+            const drawerList = document.getElementById('drawer-category-list');
+            
+            if (!mainNavList || !drawerList) return;
+            
+            // Clear existing items in drawer
+            drawerList.innerHTML = '';
+            
+            // Clone categories from main nav to drawer
+            const categories = mainNavList.querySelectorAll('li');
+            categories.forEach(category => {
+                const clone = category.cloneNode(true);
+                drawerList.appendChild(clone);
+            });
+        }
+        
+        // Your existing fetchCategories function
+        async function fetchCategories() {
+            try {
+                const response = await fetch('https://ecommercebackend-4zll.onrender.com/api/categories');
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const categories = await response.json();
+                populateCategoryDropdown(categories);
+                populateMainNavCategories(categories);
+            } catch (error) {
+                console.error("Error fetching categories:", error);
+                // Fallback to hardcoded categories if API fails
+                // const fallbackCategories = [
+                //     {id: 1, name: "STRUCTURAL & COMPOSITE MATERIALS"},
+                //     {id: 2, name: "SATELLITE & RF COMMUNICATION SYSTEMS"},
+                //     {id: 3, name: "AUTOMOTIVE MECHANICAL SYSTEMS"},
+                //     {id: 4, name: "PRECISION MEDICAL DEVICES"},
+                //     {id: 5, name: "RARE-EARTH & INDUSTRIAL MAGNETS"},
+                //     {id: 6, name: "HIGH-PERFORMANCE CERAMIC SUBSTRATES"}
+                // ];
+                populateMainNavCategories(fallbackCategories);
+            }
+        }
+        
+        function populateMainNavCategories(categories) {
+            const ulElement = document.getElementById("main-nav-category-list");
+            if (!ulElement) return;
+            
+            // Clear existing dynamic categories, keep "Home"
+            const homeItem = ulElement.querySelector('li:first-child');
+            ulElement.innerHTML = '';
+            if (homeItem) ulElement.appendChild(homeItem);
+            
+            // Add categories
+            categories.forEach(category => {
+                const li = document.createElement("li");
+                const a = document.createElement("a");
+                a.href = `products.html?category=${category.id}`;
+                a.textContent = category.name;
+                li.appendChild(a);
+                ulElement.appendChild(li);
+            });
+            
+            // Update drawer categories if drawer is open
+            populateDrawerCategories();
+        }
+        
+        function populateCategoryDropdown(categories) {
+            const selectElement = document.getElementById("search-category-select");
+            if (!selectElement) return;
+            
+            // Keep the "All Categories" option, clear others
+            const allOption = selectElement.querySelector('option[value="0"]');
+            selectElement.innerHTML = '';
+            if (allOption) selectElement.appendChild(allOption);
+            
+            categories.forEach(category => {
+                const option = document.createElement("option");
+                option.value = category.id;
+                option.textContent = category.name;
+                selectElement.appendChild(option);
+            });
         }
     </script>
 </body>

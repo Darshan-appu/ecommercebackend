@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vendor Panel - Edit Profile</title>
+  <link rel="stylesheet" href="vendor-sidebar.css">
+  <style>
+    /* Basic styling for the form */
+    .profile-form-container {
+      max-width: 600px;
+      margin: 20px auto;
+      padding: 20px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    .profile-form-container label {
+      display: block;
+      margin-top: 10px;
+      font-weight: bold;
+    }
+    .profile-form-container input,
+    .profile-form-container textarea {
+      width: 100%;
+      padding: 8px;
+      margin-top: 5px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      box-sizing: border-box;
+    }
+    .profile-form-container button {
+      margin-top: 20px;
+      padding: 10px 20px;
+      background-color: #007BFF;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    .profile-form-container button:hover {
+      background-color: #0056b3;
+    }
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      margin-bottom: 15px;
+    }
+    .form-group .field-with-button {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .form-group .field-with-button input {
+      flex-grow: 1;
+    }
+    .verification-status {
+      font-size: 0.9em;
+      margin-top: 5px;
+      color: #888;
+    }
+    .status-verified {
+      color: green;
+    }
+    .status-not-verified {
+      color: red;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="sidebar">
+    <h2>Vendor Panel</h2>
+    <a href="vendor-dashboard.html"> Dashboard</a>
+    <a href="vendor-add-product.html"> Add Product</a>
+    <a href="vendor-product-list.html"> Product List</a>
+    <a href="vendor-edit-profile.html" class="active"> Edit Profile</a>
+    <a href="vendor-view-profile.html"> View Profile</a>
+    <a href="vendor-login.html" id="logoutBtn"> Logout</a>
+  </div>
+
+  <div class="main-content">
+    <h1> Edit Profile</h1>
+    <p>Update your vendor profile information.</p>
+
+    <div class="profile-form-container">
+      <form id="editProfileForm">
+        <label for="firstName">First Name:</label>
+        <input type="text" id="firstName" name="firstName" required>
+
+        <label for="lastName">Last Name:</label>
+        <input type="text" id="lastName" name="lastName" required>
+
+        <div class="form-group">
+          <label for="email">Email:</label>
+          <div class="field-with-button">
+            <input type="email" id="email" name="email" required disabled>
+            <button type="button" id="verifyEmailBtn">Verify</button>
+          </div>
+          <span id="emailStatus" class="verification-status"></span>
+        </div>
+
+        <div class="form-group">
+          <label for="phoneDay">Daytime Phone:</label>
+          <div class="field-with-button">
+            <input type="tel" id="phoneDay" name="phoneDay">
+            <button type="button" id="verifyPhoneDayBtn">Verify</button>
+          </div>
+          <span id="phoneDayStatus" class="verification-status"></span>
+        </div>
+
+        <div class="form-group">
+          <label for="phoneEvening">Evening Phone:</label>
+          <div class="field-with-button">
+            <input type="tel" id="phoneEvening" name="phoneEvening">
+            <button type="button" id="verifyPhoneEveningBtn">Verify</button>
+          </div>
+          <span id="phoneEveningStatus" class="verification-status"></span>
+        </div>
+
+        <label for="companyAddress">Company Address:</label>
+        <textarea id="companyAddress" name="companyAddress" rows="3"></textarea>
+
+        <label for="city">City:</label>
+        <input type="text" id="city" name="city">
+
+        <label for="state">State:</label>
+        <input type="text" id="state" name="state">
+
+        <label for="zipCode">Zip Code:</label>
+        <input type="text" id="zipCode" name="zipCode">
+
+        <button type="submit">💾 Save Changes</button>
+      </form>
+    </div>
+  </div>
+
+  <div id="otpModal" class="modal" style="display: none;">
+  <div class="modal-content">
+    <span class="close-btn">&times;</span>
+    <h3>Enter OTP</h3>
+    <p>A 6-digit OTP has been sent to your <span id="otpType"></span>.</p>
+    <input type="text" id="otpInput" placeholder="Enter OTP" maxlength="6">
+    <button id="submitOtpBtn">Verify</button>
+  </div>
+</div>
+
+<style>
+  .modal {
+  display: none;
+  position: fixed;
+  z-index: 1000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: rgba(0,0,0,0.4);
+}
+
+.modal-content {
+  background-color: #fefefe;
+  margin: 15% auto;
+  padding: 20px;
+  border: 1px solid #888;
+  width: 80%;
+  max-width: 400px;
+  border-radius: 8px;
+  position: relative;
+  text-align: center;
+}
+
+.close-btn {
+  color: #aaa;
+  float: right;
+  font-size: 28px;
+  font-weight: bold;
+}
+
+.close-btn:hover,
+.close-btn:focus {
+  color: black;
+  text-decoration: none;
+  cursor: pointer;
+}
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const form = document.getElementById('editProfileForm');
+      const verifyEmailBtn = document.getElementById('verifyEmailBtn');
+      const verifyPhoneDayBtn = document.getElementById('verifyPhoneDayBtn');
+      const verifyPhoneEveningBtn = document.getElementById('verifyPhoneEveningBtn');
+      const emailInput = document.getElementById('email');
+      const phoneDayInput = document.getElementById('phoneDay');
+      const phoneEveningInput = document.getElementById('phoneEvening');
+      const emailStatus = document.getElementById('emailStatus');
+      const phoneDayStatus = document.getElementById('phoneDayStatus');
+      const phoneEveningStatus = document.getElementById('phoneEveningStatus');
+      const vendorToken = localStorage.getItem('vendorToken');
+      
+      // Modal elements
+      const otpModal = document.getElementById('otpModal');
+      const closeBtn = document.querySelector('.close-btn');
+      const otpInput = document.getElementById('otpInput');
+      const submitOtpBtn = document.getElementById('submitOtpBtn');
+      const otpTypeSpan = document.getElementById('otpType');
+
+      if (!vendorToken) {
+        alert("Authentication token not found. Please log in.");
+        window.location.href = 'vendor-login.html';
+        return;
+      }
+
+      // Function to update the verification status display
+      function updateStatus(element, isVerified) {
+        if (isVerified) {
+          element.textContent = '✅ Verified';
+          element.className = 'verification-status status-verified';
+        } else {
+          element.textContent = '❌ Not Verified';
+          element.className = 'verification-status status-not-verified';
+        }
+      }
+
+      // Function to load the profile data
+      function loadProfile() {
+        fetch('/api/vendor/profile', {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${vendorToken}`
+          }
+        })
+        .then(response => {
+          if (!response.ok) {
+            throw new Error('Failed to load profile data.');
+          }
+          return response.json();
+        })
+        .then(data => {
+          document.getElementById('firstName').value = data.firstName || '';
+          document.getElementById('lastName').value = data.lastName || '';
+          document.getElementById('email').value = data.email || '';
+          document.getElementById('phoneDay').value = data.phoneDay || '';
+          document.getElementById('phoneEvening').value = data.phoneEvening || '';
+          document.getElementById('companyAddress').value = data.companyAddress || '';
+          document.getElementById('city').value = data.city || '';
+          document.getElementById('state').value = data.state || '';
+          document.getElementById('zipCode').value = data.zipCode || '';
+
+          updateStatus(emailStatus, data.emailVerified);
+          updateStatus(phoneDayStatus, data.phoneDayVerified);
+          updateStatus(phoneEveningStatus, data.phoneEveningVerified);
+
+          // Hide verify buttons if already verified
+          if (data.emailVerified) {
+              verifyEmailBtn.style.display = 'none';
+          } else {
+              verifyEmailBtn.style.display = 'inline-block';
+          }
+
+          if (data.phoneDayVerified) {
+              verifyPhoneDayBtn.style.display = 'none';
+          } else {
+              verifyPhoneDayBtn.style.display = 'inline-block';
+          }
+
+          if (data.phoneEveningVerified) {
+              verifyPhoneEveningBtn.style.display = 'none';
+          } else {
+              verifyPhoneEveningBtn.style.display = 'inline-block';
+          }
+        })
+        .catch(error => {
+          console.error('Error fetching profile:', error);
+          alert('Failed to load profile. Please login again.');
+          window.location.href = 'vendor-login.html';
+        });
+      }
+
+      // Handle the verification process
+      async function handleVerification(type, value) {
+        if (!value) {
+          alert(`Please enter your ${type} first.`);
+          return;
+        }
+
+        try {
+          // 1. Send OTP
+          const sendOtpUrl = type === 'email' ? `/api/vendor/send-otp/email?email=${value}` : `/api/vendor/send-otp/mobile?mobile=${value}`;
+          const sendOtpResponse = await fetch(sendOtpUrl, {
+            method: 'POST',
+            headers: { 'Authorization': `Bearer ${vendorToken}` }
+          });
+          if (!sendOtpResponse.ok) {
+            const errorText = await sendOtpResponse.text();
+            throw new Error(errorText || 'Failed to send OTP.');
+          }
+          alert(`OTP sent to your ${type}.`);
+          
+          // 2. Show the OTP modal
+          otpTypeSpan.textContent = type;
+          otpModal.style.display = 'block';
+
+          // 3. Wait for the user to submit OTP from the modal
+          const otp = await new Promise((resolve) => {
+            submitOtpBtn.onclick = () => {
+              resolve(otpInput.value);
+            };
+            closeBtn.onclick = () => {
+              resolve(null);
+            };
+            window.onclick = (event) => {
+              if (event.target === otpModal) {
+                resolve(null);
+              }
+            };
+          });
+
+          otpModal.style.display = 'none';
+          otpInput.value = '';
+
+          if (!otp) return;
+
+          // 4. Verify OTP
+          const verifyUrl = type === 'email' ? `/api/vendor/verify/email?email=${value}&otp=${otp}` : `/api/vendor/verify/mobile?mobile=${value}&otp=${otp}`;
+          const verifyResponse = await fetch(verifyUrl, {
+            method: 'PUT',
+            headers: { 'Authorization': `Bearer ${vendorToken}` }
+          });
+
+          if (!verifyResponse.ok) {
+            const errorText = await verifyResponse.text();
+            throw new Error(errorText || 'Invalid or expired OTP.');
+          }
+          
+          alert(`${type} verified successfully!`);
+          loadProfile();
+
+        } catch (error) {
+          console.error('Verification error:', error);
+          alert(`Verification failed: ${error.message}`);
+        }
+      }
+
+      verifyEmailBtn.addEventListener('click', () => {
+        handleVerification('email', emailInput.value);
+      });
+      verifyPhoneDayBtn.addEventListener('click', () => {
+        handleVerification('daytime phone', phoneDayInput.value);
+      });
+      verifyPhoneEveningBtn.addEventListener('click', () => {
+        handleVerification('evening phone', phoneEveningInput.value);
+      });
+
+      loadProfile();
+
+      form.addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        const updatedProfile = {
+          firstName: document.getElementById('firstName').value,
+          lastName: document.getElementById('lastName').value,
+          phoneDay: phoneDayInput.value,
+          phoneEvening: phoneEveningInput.value,
+          companyAddress: document.getElementById('companyAddress').value,
+          city: document.getElementById('city').value,
+          state: document.getElementById('state').value,
+          zipCode: document.getElementById('zipCode').value
+        };
+
+        fetch('/api/vendor/profile', {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${vendorToken}`
+          },
+          body: JSON.stringify(updatedProfile)
+        })
+        .then(response => {
+          if (!response.ok) {
+            throw new Error('Failed to update profile.');
+          }
+          return response.text();
+        })
+        .then(message => {
+          alert("Profile updated successfully!");
+          loadProfile();
+        })
+        .catch(error => {
+          console.error('Error updating profile:', error);
+          alert("Profile update failed: " + error.message);
+        });
+      });
+      
+      document.getElementById('logoutBtn').addEventListener('click', () => {
+        localStorage.removeItem('vendorToken');
+        window.location.href = 'vendor-login.html';
+      });
+    });
+</script>
+</body>
+</html>

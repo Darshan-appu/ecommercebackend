@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vendor Panel - Add Product</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="vendor-sidebar.css">
+    <style>
+        .hidden {
+            display: none;
+        }
+        img.preview {
+            max-width: 150px;
+            margin-top: 10px;
+            display: block;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="sidebar">
+        <h2>Vendor Panel</h2>
+        <a href="vendor-dashboard.html">Dashboard</a>
+        <a href="vendor-add-product.html" class="active">Add Product</a>
+        <a href="vendor-product-list.html">Product List</a>
+        <a href="vendor-edit-profile.html">Edit Profile</a>
+        <a href="vendor-view-profile.html">View Profile</a>
+        <a href="vendor-login.html">Logout</a>
+    </div>
+
+    <div class="main-content container mt-4">
+        <h1>Add New Product</h1>
+        <p>Fill out the details below to add a new product to your store.</p>
+
+        <form id="addProductForm" class="row g-3">
+            
+            <div class="col-md-6">
+                <label class="form-label">Product Name</label>
+                <input type="text" class="form-control" id="productName" required>
+            </div>
+
+            <div class="col-md-12">
+                <label class="form-label">Description</label>
+                <textarea class="form-control" id="productDescription" rows="3" required></textarea>
+            </div>
+
+            <div class="col-md-4">
+                <label class="form-label">Price</label>
+                <input type="number" class="form-control" id="productPrice" required>
+            </div>
+
+            <div class="col-md-4">
+                <label class="form-label">Stock Quantity</label>
+                <input type="number" class="form-control" id="productStock" required>
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label">Select Category</label>
+                <select id="productCategory" class="form-select" required>
+                    <option value="">-- Select Category --</option>
+                </select>
+                <input type="text" id="suggestedCategory" class="form-control mt-2 d-none" placeholder="Enter New Category">
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label">Select Subcategory</label>
+                <select id="productSubCategory" class="form-select" required>
+                    <option value="">-- Select Subcategory --</option>
+                </select>
+                <input type="text" id="suggestedSubCategory" class="form-control mt-2 d-none" placeholder="Enter New Subcategory">
+            </div>
+
+            <div class="col-md-12">
+                <label class="form-label">Specifications (key:value, comma separated)</label>
+                <input type="text" class="form-control" id="specifications" placeholder="Color:Black, Weight:150g">
+            </div>
+
+            <div class="col-md-4">
+                <label class="form-label">Product Image</label>
+                <input type="file" class="form-control" id="productImage" accept="image/*" required>
+            </div>
+
+            <div class="col-md-4">
+                <label class="form-label">Datasheet</label>
+                <input type="file" class="form-control" id="datasheet" accept=".pdf">
+            </div>
+
+            <div class="col-md-4" id="categoryImageWrapper">
+                <label class="form-label">Category Image</label>
+                <input type="file" class="form-control" id="categoryImage" accept="image/*">
+            </div>
+            <div class="col-md-4">
+                <img id="categoryImagePreview" class="preview hidden" alt="Category Image Preview"/>
+            </div>
+
+            <div class="col-12 mt-4">
+                <button type="submit" class="btn btn-primary">Submit</button>
+            </div>
+
+        </form>
+    </div>
+
+    <div class="modal fade" id="confirmModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Confirm Product Details</h5>
+                    <button type="button" id="downloadPDF" class="btn btn-sm btn-outline-secondary">Download PDF</button>
+                </div>
+                <div class="modal-body" id="confirmSummary"></div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Back</button>
+                    <button type="button" class="btn btn-success" id="confirmBtn">Confirm & Submit</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="successModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content text-center p-3">
+                <h5> Product Submitted Successfully</h5>
+                <div class="mt-3">
+                    <a href="vendor-product-list.html" class="btn btn-primary">Show Products</a>
+                    <button class="btn btn-success" id="addAnotherBtn">Add Another Product</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+    <script>
+        const API_BASE = "http://localhost:8080/api";
+        let existingCategoryImageUrl = "";
+
+        // Load categories on page load
+        // document.addEventListener("DOMContentLoaded", async () => {
+        //     try {
+        //         const res = await fetch(`${API_BASE}/categories`);
+        //         const categories = await res.json();
+        //         const categorySelect = document.getElementById("productCategory");
+
+        //         categories.forEach(cat => {
+        //             const option = document.createElement("option");
+        //             //option.value =cat.id;
+        //                                 option.value =cat.name;
+
+        //             option.textContent = cat.name;
+        //             categorySelect.appendChild(option);
+        //         });
+        //         // Add 'Other' option at the end
+        //         const otherOption = document.createElement("option");
+        //         otherOption.value = "other";
+        //         otherOption.textContent = "Other";
+        //         categorySelect.appendChild(otherOption);
+
+        //     } catch (error) {
+        //         console.error("Error loading categories:", error);
+        //     }
+        // });
+
+
+
+
+        // Load categories on page load
+// document.addEventListener("DOMContentLoaded", async () => {
+//     try {
+//         const res = await fetch(`${API_BASE}/categories`);
+//         const categories = await res.json();
+//         const categorySelect = document.getElementById("productCategory");
+//         categories.forEach(cat => {
+//             const option = document.createElement("option");
+//             option.value = cat.id; // Correct: Use ID as value
+//             option.textContent = cat.name;
+//             categorySelect.appendChild(option);
+//         });
+//         const otherOption = document.createElement("option");
+//         otherOption.value = "other";
+//         otherOption.textContent = "Other";
+//         categorySelect.appendChild(otherOption);
+//     } catch (error) {
+//         console.error("Error loading categories:", error);
+//     }
+// });
+// // When loading subcategories, also use ID as the value
+// document.getElementById("productCategory").addEventListener("change", async (e) => {
+//     // ... (Your existing code to load subcategories) ...
+//     subcategories.forEach(sub => {
+//         const option = document.createElement("option");
+//         option.value = sub.id; // Correct: Use ID as value
+//         option.textContent = sub.name;
+//         subCategorySelect.appendChild(option);
+//     });
+//     // ...
+// });
+
+// Load categories on page load
+document.addEventListener("DOMContentLoaded", async () => {
+    try {
+        const res = await fetch(`${API_BASE}/categories`);
+        const categories = await res.json();
+        const categorySelect = document.getElementById("productCategory");
+
+        categories.forEach(cat => {
+            const option = document.createElement("option");
+            option.value = cat.id; // Set value to ID for API calls
+            option.textContent = cat.name;
+            categorySelect.appendChild(option);
+        });
+        // Add 'Other' option at the end
+        const otherOption = document.createElement("option");
+        otherOption.value = "other";
+        otherOption.textContent = "Other";
+        categorySelect.appendChild(otherOption);
+
+    } catch (error) {
+        console.error("Error loading categories:", error);
+    }
+});
+
+// Handle category change to load subcategories
+document.getElementById("productCategory").addEventListener("change", async (e) => {
+    const categoryId = e.target.value;
+    const subCategorySelect = document.getElementById("productSubCategory");
+    const suggestedCategoryInput = document.getElementById("suggestedCategory");
+    const suggestedSubCategoryInput = document.getElementById("suggestedSubCategory");
+    const categoryImagePreview = document.getElementById("categoryImagePreview");
+    const categoryImageWrapper = document.getElementById("categoryImageWrapper");
+
+    // Reset subcategory dropdown and image-related variables
+    subCategorySelect.innerHTML = '<option value="">-- Select Subcategory --</option>';
+    subCategorySelect.disabled = false;
+    categoryImagePreview.classList.add("hidden");
+    categoryImageWrapper.classList.remove('d-none');
+    existingCategoryImageUrl = "";
+
+    if (categoryId === "other") {
+        suggestedCategoryInput.classList.remove("d-none");
+        subCategorySelect.innerHTML = '<option value="other">Other</option>';
+        subCategorySelect.value = "other";
+        subCategorySelect.disabled = true;
+        suggestedSubCategoryInput.classList.remove("d-none");
+        return;
+    } else {
+        suggestedCategoryInput.classList.add("d-none");
+        suggestedSubCategoryInput.classList.add("d-none");
+    }
+
+    // Add 'Other' option for subcategories if a standard category is selected
+    const otherSubOption = document.createElement("option");
+    otherSubOption.value = "other";
+    otherSubOption.textContent = "Other";
+    subCategorySelect.appendChild(otherSubOption);
+
+    if (categoryId) {
+        try {
+            // Use the category ID to load subcategories
+            const res = await fetch(`${API_BASE}/subcategories/by-category/${categoryId}`);
+            const subcategories = await res.json();
+            subcategories.forEach(sub => {
+                const option = document.createElement("option");
+                option.value = sub.id; // Set value to ID
+                option.textContent = sub.name;
+                subCategorySelect.appendChild(option);
+            });
+
+            // Fetch category details to get the image URL
+            const catRes = await fetch(`${API_BASE}/categories/${categoryId}`);
+            if (catRes.ok) {
+                const category = await catRes.json();
+                if (category.imageUrl) {
+                    existingCategoryImageUrl = category.imageUrl;
+                    categoryImagePreview.src = existingCategoryImageUrl;
+                    categoryImagePreview.classList.remove("hidden");
+                    categoryImageWrapper.classList.add("d-none");
+                } else {
+                    console.log("⚠️ No image for this category. Vendor must upload.");
+                }
+            }
+        } catch (error) {
+            console.error("Error loading subcategories or category image:", error);
+        }
+    }
+});
+
+// Step 2: Confirm -> API Call -> Show Success Modal
+document.getElementById('confirmBtn').addEventListener('click', async function() {
+    const confirmModal = bootstrap.Modal.getInstance(document.getElementById('confirmModal'));
+    if (confirmModal) {
+        confirmModal.hide();
+    }
+
+    const token = localStorage.getItem("vendorToken");
+    if (!token) {
+        alert("Vendor token not found! Please login again.");
+        return;
+    }
+
+    const formData = new FormData();
+    const product = {
+        productName: document.getElementById("productName").value,
+        description: document.getElementById("productDescription").value,
+        price: parseFloat(document.getElementById("productPrice").value),
+        stock: parseInt(document.getElementById("productStock").value),
+        // Use selected IDs for standard categories, but suggested names for 'other'
+        selectedCategory: document.getElementById("productCategory").value === "other" ? null : document.getElementById("productCategory").options[document.getElementById("productCategory").selectedIndex].textContent,
+        selectedSubCategory: document.getElementById("productSubCategory").value === "other" ? null : document.getElementById("productSubCategory").options[document.getElementById("productSubCategory").selectedIndex].textContent,
+        suggestedCategory: document.getElementById("productCategory").value === "other" ? document.getElementById("suggestedCategory").value : null,
+        suggestedSubCategory: document.getElementById("productSubCategory").value === "other" ? document.getElementById("suggestedSubCategory").value : null,
+        specifications: []
+    };
+
+    // Parse specs from the input field
+    const specsInput = document.getElementById("specifications").value;
+    if (specsInput.trim()) {
+        specsInput.split(",").forEach(spec => {
+            const [key, value] = spec.split(":").map(s => s.trim());
+            if (key && value) {
+                product.specifications.push({ key, value });
+            }
+        });
+    }
+
+    formData.append("product", JSON.stringify(product));
+    formData.append("productImage", document.getElementById("productImage").files[0]);
+
+    if (document.getElementById("datasheet").files[0]) {
+        formData.append("datasheet", document.getElementById("datasheet").files[0]);
+    }
+
+    // Handle the category image: new upload or fetch existing
+    const newCategoryImageFile = document.getElementById("categoryImage").files[0];
+    if (newCategoryImageFile) {
+        formData.append("categoryImage", newCategoryImageFile);
+    } else if (existingCategoryImageUrl) {
+        try {
+            const imageRes = await fetch(existingCategoryImageUrl);
+            if (!imageRes.ok) throw new Error("Failed to fetch existing category image.");
+            const imageBlob = await imageRes.blob();
+            formData.append("categoryImage", imageBlob, "category_image.jpg");
+        } catch (error) {
+            console.error("Error fetching and appending existing category image:", error);
+            alert("Failed to submit. Could not process the existing category image.");
+            return;
+        }
+    } else {
+        alert("Please select a category or upload a new category image.");
+        return;
+    }
+
+    try {
+        const response = await fetch(`${API_BASE}/vendor/product-request/submit`, {
+            method: "POST",
+            headers: {
+                "Authorization": "Bearer " + token
+            },
+            body: formData
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || "Failed to submit product.");
+        }
+
+        const result = await response.json();
+        console.log("Submission successful:", result);
+
+        // Show success modal
+        new bootstrap.Modal(document.getElementById('successModal')).show();
+    } catch (err) {
+        console.error("Submit error:", err);
+        // 2
+        alert("❌ Failed to submit: " + err.message);
+    }
+});
+
+        // Handle subcategory change to toggle suggested subcategory field
+        document.getElementById("productSubCategory").addEventListener("change", function() {
+            const subcategoryId = this.value;
+            const suggestedSubCategoryInput = document.getElementById("suggestedSubCategory");
+            if (subcategoryId === "other") {
+                suggestedSubCategoryInput.classList.remove("d-none");
+            } else {
+                suggestedSubCategoryInput.classList.add("d-none");
+            }
+        });
+
+        // Step 1: Form Submission -> Show Confirm Modal
+        document.getElementById('addProductForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            // Collect all form data for the summary
+            const summaryHTML = `
+                <p><strong>Name:</strong> ${document.getElementById('productName').value}</p>
+                <p><strong>Description:</strong> ${document.getElementById('productDescription').value}</p>
+                <p><strong>Price:</strong> ₹${document.getElementById('productPrice').value}</p>
+                <p><strong>Stock Quantity:</strong> ${document.getElementById('productStock').value}</p>
+                <p><strong>Category:</strong> ${document.getElementById('productCategory').value === "other" ? document.getElementById('suggestedCategory').value : document.getElementById('productCategory').options[document.getElementById('productCategory').selectedIndex].textContent}</p>
+                <p><strong>Subcategory:</strong> ${document.getElementById('productSubCategory').value === "other" ? document.getElementById('suggestedSubCategory').value : document.getElementById('productSubCategory').options[document.getElementById('productSubCategory').selectedIndex].textContent}</p>
+            `;
+            document.getElementById('confirmSummary').innerHTML = summaryHTML;
+
+            // Show the confirmation modal
+            const confirmModal = new bootstrap.Modal(document.getElementById('confirmModal'));
+            confirmModal.show();
+        });
+
+        // // Step 2: Confirm -> API Call -> Show Success Modal
+        document.getElementById('confirmBtn').addEventListener('click', async function() {
+            const confirmModal = bootstrap.Modal.getInstance(document.getElementById('confirmModal'));
+            if (confirmModal) {
+                confirmModal.hide();
+            }
+
+            const token = localStorage.getItem("vendorToken");
+            if (!token) {
+                alert("Vendor token not found! Please login again.");
+                return;
+            }
+
+            const formData = new FormData();
+        const product = {
+        productName: document.getElementById("productName").value,
+        description: document.getElementById("productDescription").value,
+        price: parseFloat(document.getElementById("productPrice").value),
+        stock: parseInt(document.getElementById("productStock").value),
+        
+        // This is the correct way to get the name
+        categoryName: document.getElementById("productCategory").value === "other"
+            ? document.getElementById("suggestedCategory").value
+            : document.getElementById("productCategory").options[document.getElementById("productCategory").selectedIndex].textContent,
+        
+        subcategoryName: document.getElementById("productSubCategory").value === "other"
+            ? document.getElementById("suggestedSubCategory").value
+            : document.getElementById("productSubCategory").options[document.getElementById("productSubCategory").selectedIndex].textContent,
+        
+        specifications: []
+    };
+
+            // Parse specs from the input field
+            const specsInput = document.getElementById("specifications").value;
+            if (specsInput.trim()) {
+                specsInput.split(",").forEach(spec => {
+                    const [key, value] = spec.split(":").map(s => s.trim());
+                    if (key && value) {
+                        product.specifications.push({ key, value });
+                    }
+                });
+            }
+
+            formData.append("product", JSON.stringify(product));
+            formData.append("productImage", document.getElementById("productImage").files[0]);
+
+            if (document.getElementById("datasheet").files[0]) {
+                formData.append("datasheet", document.getElementById("datasheet").files[0]);
+            }
+
+            // Handle the category image: new upload or fetch existing
+            const newCategoryImageFile = document.getElementById("categoryImage").files[0];
+            if (newCategoryImageFile) {
+                formData.append("categoryImage", newCategoryImageFile);
+            } else if (existingCategoryImageUrl) {
+                try {
+                    const imageRes = await fetch(existingCategoryImageUrl);
+                    if (!imageRes.ok) throw new Error("Failed to fetch existing category image.");
+                    const imageBlob = await imageRes.blob();
+                    formData.append("categoryImage", imageBlob, "category_image.jpg");
+                } catch (error) {
+                    console.error("Error fetching and appending existing category image:", error);
+                    alert("Failed to submit. Could not process the existing category image.");
+                    return;
+                }
+            } else {
+                alert("Please select a category or upload a new category image.");
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE}/vendor/product-request/submit`, {
+                    method: "POST",
+                    headers: {
+                        "Authorization": "Bearer " + token
+                    },
+                    body: formData
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.message || "Failed to submit product.");
+                }
+
+                const result = await response.json();
+                console.log("Submission successful:", result);
+
+                // Show success modal
+                new bootstrap.Modal(document.getElementById('successModal')).show();
+            } catch (err) {
+                console.error("Submit error:", err);
+//    1 
+            // alert("❌ Failed to submit: " + err.message);
+            }
+        });
+
+
+        // Add Another Product Button
+        document.getElementById('addAnotherBtn').addEventListener('click', function() {
+            const successModal = bootstrap.Modal.getInstance(document.getElementById('successModal'));
+            if (successModal) {
+                successModal.hide();
+            }
+            // Reset form and UI states
+            document.getElementById('addProductForm').reset();
+            document.getElementById('suggestedCategory').classList.add('d-none');
+            document.getElementById('suggestedSubCategory').classList.add('d-none');
+            document.getElementById('categoryImageWrapper').classList.remove('d-none');
+            document.getElementById('categoryImagePreview').classList.add('hidden');
+            existingCategoryImageUrl = "";
+            document.getElementById('productSubCategory').innerHTML = '<option value="">-- Select Subcategory --</option>';
+        });
+
+        // Download PDF
+        document.getElementById('downloadPDF').addEventListener('click', function() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            doc.text("Product Specification Summary", 10, 10);
+            doc.fromHTML(document.getElementById('confirmSummary').innerHTML, 10, 20);
+            doc.save("product-summary.pdf");
+        });
+    </script>
+</body>
+</html>

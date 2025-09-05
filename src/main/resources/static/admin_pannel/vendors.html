@@ -141,7 +141,7 @@
             padding: 3px 8px;
             border-radius: 12px;
             font-size: 0.8em;
-            color: white;
+            /* color: #ffff; */
             font-weight: bold;
         }
         .status-Pending { background-color: #ffc107; } /* Orange */
@@ -193,24 +193,19 @@
     </style>
 </head>
 <body>
-    <!-- Sidebar -->
-   <div id="sidebar-placeholder"></div>
+    <div id="sidebar-placeholder"></div>
 
     
-    <!-- Main Content -->
     <div class="main">
-        <!-- Top Navigation -->
-                 <div id="top-navbar-placeholder"></div>
+        <div id="top-navbar-placeholder"></div>
 
         
-        <!-- Content Area -->
         <div class="content">
             <div class="page-header">
                 <h2>Vendor Management</h2>
                 <button class="btn btn-primary" id="addVendorBtn"><i class="fas fa-plus"></i> Add New Vendor</button>
             </div>
             
-            <!-- Vendors Table -->
             <div class="card">
                 <div class="card-header">
                     <h3>All Vendors</h3>
@@ -225,13 +220,11 @@
                                 <th>Email</th>
                                 <th>Phone</th>
                                 <th>Status</th>
-                                <!-- Removed Ratings header -->
                                 <th>Actions</th>
                             </tr>
                         </thead>
                         <tbody id="vendorsTableBody">
-                            <!-- Vendor data will be loaded here via JavaScript -->
-                        </tbody>
+                            </tbody>
                     </table>
                 </div>
                 <div class="spinner" id="loadingSpinner"></div>
@@ -240,7 +233,6 @@
         </div>
     </div>
 
-    <!-- Add/Edit Vendor Modal -->
     <div id="vendorModal" class="modal">
         <div class="modal-content">
             <span class="close-button">&times;</span>
@@ -398,7 +390,6 @@
                         <option value="Rejected">Rejected</option>
                     </select>
                 </div>
-                <!-- Hidden the Ratings form group -->
                 <div class="form-group" style="display: none;">
                     <label for="ratings">Ratings (0.0 - 5.0)</label>
                     <input type="number" id="ratings" name="ratings" step="0.1" min="0" max="5">
@@ -412,12 +403,11 @@
         </div>
     </div>
 
-    <!-- Message Box -->
     <div id="messageBox" class="message-box"></div>
 
 <script>
 document.addEventListener('DOMContentLoaded', () => {
-    const API_BASE_URL = 'https://ecommercebackend-i16e.onrender.com/api/vendor';
+    const API_BASE_URL = 'https://ecommercebackend-4zll.onrender.com/api/admin/vendors';
     const elements = {
         tableBody: document.getElementById('vendorsTableBody'),
         modal: document.getElementById('vendorModal'),
@@ -429,10 +419,21 @@ document.addEventListener('DOMContentLoaded', () => {
         saveBtn: document.getElementById('saveVendorBtn'),
         spinner: document.getElementById('loadingSpinner'),
         noDataMsg: document.getElementById('noVendorsMessage'),
-        msgBox: document.getElementById('messageBox')
+        msgBox: document.getElementById('messageBox'),
+        // Add status select element
+        statusSelect: document.getElementById('status')
     };
 
     let editingVendorId = null;
+
+    // Get the auth token from local storage
+    const token = localStorage.getItem('adminToken');
+    if (!token) {
+        alert('Please login to access this page.');
+        window.location.href = '/admin_pannel/admin-login.html';
+        return;
+    }
+    const authHeader = `Bearer ${token}`;
 
     function showMessage(text, type = 'info') {
         elements.msgBox.textContent = text;
@@ -449,7 +450,11 @@ document.addEventListener('DOMContentLoaded', () => {
     async function fetchVendors() {
         toggleSpinner(true);
         try {
-            const res = await fetch(API_BASE_URL);
+            const res = await fetch(API_BASE_URL, {
+                headers: {
+                    'Authorization': authHeader
+                }
+            });
             if (res.status === 204) {
                 elements.tableBody.innerHTML = '';
                 elements.noDataMsg.textContent = 'No vendors found.';
@@ -473,15 +478,15 @@ document.addEventListener('DOMContentLoaded', () => {
         vendors.forEach(v => {
             const row = elements.tableBody.insertRow();
             row.innerHTML = `
-                <td>${v.id}</td>
+                <td>${v.vendorId}</td>
                 <td>${v.businessName}</td>
                 <td>${v.firstName} ${v.lastName}</td>
                 <td>${v.email}</td>
                 <td>${v.phoneDay}</td>
                 <td><span class="status-badge status-${v.status}">${v.status}</span></td>
                 <td class="action-buttons">
-                    <button class="btn btn-edit" data-id="${v.id}"><i class="fas fa-edit"></i> Edit</button>
-                    <button class="btn btn-delete" data-id="${v.id}"><i class="fas fa-trash-alt"></i> Delete</button>
+                    <button class="btn btn-edit" data-id="${v.vendorId}"><i class="fas fa-edit"></i> Edit</button>
+                    <button class="btn btn-delete" data-id="${v.vendorId}"><i class="fas fa-trash-alt"></i> Delete</button>
                 </td>
             `;
         });
@@ -492,7 +497,17 @@ document.addEventListener('DOMContentLoaded', () => {
         elements.form.reset();
         for (const key in vendor) {
             const input = document.getElementById(key);
-            if (input) input.value = vendor[key];
+            if (input) {
+                if (input.type === 'radio') {
+                    if (input.value === vendor[key] || (input.value === 'Yes' && vendor[key] === true) || (input.value === 'No' && vendor[key] === false)) {
+                        input.checked = true;
+                    }
+                } else if (input.type === 'date' && vendor[key]) {
+                    input.value = vendor[key];
+                } else {
+                    input.value = vendor[key];
+                }
+            }
         }
         elements.modal.style.display = 'flex';
     }
@@ -506,6 +521,7 @@ document.addEventListener('DOMContentLoaded', () => {
         editingVendorId = null;
         openModal('Add New Vendor');
         document.getElementById('status').value = 'Pending';
+        document.getElementById('submissionDate').valueAsDate = new Date(); // Set current date
     };
     elements.closeBtn.onclick = elements.cancelBtn.onclick = closeModal;
 
@@ -517,27 +533,64 @@ document.addEventListener('DOMContentLoaded', () => {
         for (let [key, val] of formData.entries()) {
             if (key === 'employeeCount' && val) vendorData[key] = parseInt(val);
             else if (key === 'ratings') vendorData[key] = parseFloat(val || 0).toFixed(1);
-            else vendorData[key] = val || '';
+            else if (key === 'insured' || key === 'licensed') {
+                vendorData[key] = val === 'Yes';
+            } else {
+                vendorData[key] = val || '';
+            }
         }
 
         // Format dates
         ['establishmentDate', 'submissionDate'].forEach(dateKey => {
             if (vendorData[dateKey]) {
-                vendorData[dateKey] = new Date(vendorData[dateKey]).toISOString().slice(0, 10);
+                const date = new Date(vendorData[dateKey]);
+                vendorData[dateKey] = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
             }
         });
 
-        try {
-            const method = editingVendorId ? 'PUT' : 'POST';
-            const url = editingVendorId
-                ? `${API_BASE_URL}/${editingVendorId}`
-                : `${API_BASE_URL}/register`;
+        const newStatus = vendorData.status;
+        delete vendorData.status; // Remove status from the generic update payload
 
-            const res = await fetch(url, {
-                method,
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(vendorData)
-            });
+        try {
+            let res;
+            let url;
+
+            if (editingVendorId) {
+                // Determine the correct endpoint based on the selected status
+                if (newStatus === 'Approved') {
+                    url = `${API_BASE_URL}/${editingVendorId}/approve`;
+                } else if (newStatus === 'Rejected') {
+                    url = `${API_BASE_URL}/${editingVendorId}/reject`;
+                } else {
+                    // For any other field update, use the generic PUT endpoint
+                    url = `${API_BASE_URL}/${editingVendorId}`;
+                }
+                
+                // If it's a status change, the body is not needed
+                const method = 'PUT';
+                const body = newStatus === 'Approved' || newStatus === 'Rejected' ? null : JSON.stringify(vendorData);
+                
+                res = await fetch(url, {
+                    method,
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': authHeader
+                    },
+                    body
+                });
+            } else {
+                // This is for adding a new vendor
+                url = `${API_BASE_URL}/register`;
+                vendorData.status = 'Pending'; // Ensure new vendors are 'Pending'
+                res = await fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': authHeader
+                    },
+                    body: JSON.stringify(vendorData)
+                });
+            }
 
             const resData = await res.json();
             if (!res.ok) throw new Error(resData.message || 'Failed to save vendor.');
@@ -557,9 +610,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (e.target.closest('.btn-edit')) {
             try {
-                const res = await fetch(`${API_BASE_URL}/${id}`);
-                if (!res.ok) throw new Error('Failed to fetch vendor');
-                const vendor = await res.json();
+                const res = await fetch(`${API_BASE_URL}`, {
+                    headers: { 'Authorization': authHeader }
+                });
+                if (!res.ok) throw new Error('Failed to fetch vendors');
+                const vendors = await res.json();
+                const vendor = vendors.find(v => v.vendorId === id);
+                if (!vendor) throw new Error('Vendor not found');
+
+                // Convert boolean values from API to "Yes" or "No" for radio buttons
+                vendor.insured = vendor.insured ? 'Yes' : 'No';
+                vendor.licensed = vendor.licensed ? 'Yes' : 'No';
+
                 editingVendorId = id;
                 openModal('Edit Vendor', vendor);
             } catch (err) {
@@ -568,7 +630,10 @@ document.addEventListener('DOMContentLoaded', () => {
         } else if (e.target.closest('.btn-delete')) {
             if (!confirm('Are you sure you want to delete this vendor?')) return;
             try {
-                const res = await fetch(`${API_BASE_URL}/${id}`, { method: 'DELETE' });
+                const res = await fetch(`${API_BASE_URL}/${id}`, {
+                    method: 'DELETE',
+                    headers: { 'Authorization': authHeader }
+                });
                 const data = await res.json();
                 if (!res.ok) throw new Error(data.message || 'Delete failed');
                 showMessage(data.message, 'success');
@@ -579,19 +644,13 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
-    // Authentication check
-    const token = localStorage.getItem('adminToken');
-    if (!token) {
-        alert('Please login to access this page.');
-        window.location.href = '/admin_pannel/admin-login.html';
-        return;
-    }
-
     fetchVendors();
 });
 </script>
 
-   <script src="js/sidebar.js"></script>
+
+
+    <script src="js/sidebar.js"></script>
     <script src="js/topnav.js"></script>
 
 </body>

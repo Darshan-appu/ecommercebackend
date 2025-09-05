@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Search Results</title>
+
+  <link href="https://fonts.googleapis.com/css?family=Montserrat:400,500,700" rel="stylesheet" />
+  <link rel="stylesheet" href="css/bootstrap.min.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/assets/owl.carousel.min.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/assets/owl.theme.default.min.css" />
+  <link rel="stylesheet" href="css/font-awesome.min.css" />
+  <link rel="stylesheet" href="css/index.css" />
+  <link rel="stylesheet" href="css/satcom.css" />
+
+  <style>
+    /* Main Layout for Filters and Products */
+    .search-page {
+      display: grid;
+      grid-template-columns: 250px 1fr;
+      gap: 20px;
+      margin: 20px;
+    }
+
+    .filters {
+      background: #f8fafc;
+      padding: 20px;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+    }
+
+    .filter-group {
+      margin-bottom: 25px;
+    }
+
+    .filter-group h4 {
+      font-size: 16px;
+      font-weight: 700;
+      color: #334155;
+      margin-bottom: 15px;
+    }
+    .filter-group label {
+      display: block;
+      font-weight: 400;
+      color: #64748b;
+      margin-bottom: 8px;
+      cursor: pointer;
+    }
+    .filter-group input[type="radio"],
+    .filter-group input[type="checkbox"] {
+      margin-right: 8px;
+    }
+    .filter-group select {
+      width: 100%;
+      padding: 8px 12px;
+      border: 1px solid #cbd5e1;
+      border-radius: 4px;
+      margin-bottom: 10px;
+      font-size: 14px;
+    }
+
+    .results {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      gap: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div id="header-placeholder"></div>
+
+  <main class="search-page">
+    <aside class="filters">
+      <h3>Filters</h3>
+      <div class="filter-group">
+        <h4>Price</h4>
+        <label><input type="radio" name="price" value="0-500" id="price-under-500"> Under ₹500</label>
+        <label><input type="radio" name="price" value="500-1000" id="price-500-1000"> ₹500 - ₹1000</label>
+        <label><input type="radio" name="price" value="1000-5000" id="price-1000-5000"> ₹1000 - ₹5000</label>
+        <label><input type="radio" name="price" value="5000-10000" id="price-5000-10000"> ₹5000 - ₹10000</label>
+        <label><input type="radio" name="price" value="10000-999999" id="price-above-10000"> Above-₹10000</label>
+      </div>
+      <div class="filter-group">
+        <h4>Availability</h4>
+        <label><input type="checkbox" name="inStock" value="true" id="inStockCheckbox"> In Stock</label>
+      </div>
+      <div class="filter-group">
+        <h4>Sort By</h4>
+        <select id="sortBy">
+          <option value="id">Newest</option>
+          <option value="price">Price (Low to High)</option>
+          <option value="name">Name (A-Z)</option>
+        </select>
+        <label><input type="radio" name="sortDirection" value="ASC" checked> Ascending</label>
+        <label><input type="radio" name="sortDirection" value="DESC"> Descending</label>
+      </div>
+    </aside>
+
+    <section>
+      <h2>Search Results</h2>
+      <div id="search-results" class="results"></div>
+    </section>
+  </main>
+
+  <div id="footer-placeholder"></div>
+
+  <div class="modal fade" id="customizeModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-md" role="document">
+      <div class="modal-content p-3">
+        <div class="modal-header">
+          <h5 class="modal-title">Customize Product</h5>
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+        </div>
+        <div class="modal-body">
+          <p><strong id="c-prod-name"></strong></p>
+          <div id="c-specs-container"></div>
+          <div class="form-group">
+            <label>Quantity</label>
+            <input id="c-qty" type="number" class="form-control" value="1" min="1">
+          </div>
+          <div class="form-group">
+            <label>Notes</label>
+            <textarea id="c-notes" class="form-control" placeholder="Optional notes..."></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-primary" id="c-add-btn">Add to Cart</button>
+          <button class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+  <script src="js/bootstrap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/owl.carousel.min.js"></script>
+  <script src="js/jquery.zoom.min.js"></script>
+  <script src="js/navigation.js"></script>
+  <script src="js/frontend-header.js"></script>
+  <script src="js/profileBehviour.js"></script>
+  <script>
+    const API_BASE = "https://ecommercebackend-4zll.onrender.com/api/products";
+    const container = document.getElementById("search-results");
+    const urlParams = new URLSearchParams(window.location.search);
+    const initialQuery = urlParams.get("q");
+
+    $(document).ready(function() {
+      $("#header-placeholder").load("header.html");
+      $("#footer-placeholder").load("footer.html");
+    });
+
+    document.addEventListener("DOMContentLoaded", function () {
+      if (initialQuery) {
+        document.querySelector('h2').textContent = `Results for "${initialQuery}"`;
+        fetchAndRenderResults();
+      } else {
+        container.innerHTML = "<p>No search query provided. Please search for a product.</p>";
+      }
+      document.querySelectorAll("input[name='price'], #inStockCheckbox, #sortBy, input[name='sortDirection']").forEach(control => {
+        control.addEventListener("change", fetchAndRenderResults);
+      });
+    });
+
+    function fetchAndRenderResults() {
+      const query = urlParams.get("q");
+      if (!query) return;
+      let apiUrl = `${API_BASE}/search?q=${encodeURIComponent(query)}`;
+      const priceRange = document.querySelector("input[name='price']:checked")?.value;
+      if (priceRange) {
+        const [min, max] = priceRange.split("-");
+        apiUrl += `&minPrice=${min}&maxPrice=${max}`;
+      }
+      const inStock = document.getElementById("inStockCheckbox").checked;
+      if (inStock) {
+        apiUrl += "&inStock=true";
+      }
+      const sortBy = document.getElementById("sortBy").value;
+      const sortDirection = document.querySelector("input[name='sortDirection']:checked").value;
+      apiUrl += `&sortBy=${sortBy}&direction=${sortDirection}`;
+
+      fetch(apiUrl)
+        .then(res => {
+          if (!res.ok) {
+            throw new Error('Network response was not ok');
+          }
+          return res.json();
+        })
+        .then(data => renderSearchResults(data.content || []))
+        .catch(err => {
+          console.error("Error fetching search results:", err);
+          container.innerHTML = `<p>Error fetching results: ${err.message}</p>`;
+        });
+    }
+
+    function renderSearchResults(products) {
+      container.innerHTML = "";
+      if (!products.length) {
+        container.innerHTML = "<p>No products found matching your criteria.</p>";
+        return;
+      }
+      products.forEach(p => {
+        const hasSheet = !!p.datasheetUrl;
+        const productCard = document.createElement('div');
+        productCard.className = 'product modern-product-card';
+        productCard.innerHTML = `
+          <div class="product-top-link">
+            <div class="product-img">
+              <img src="${p.imageUrl || './img/placeholder.png'}" alt="${p.name}" />
+            </div>
+            <div class="product-body">
+              <p class="product-category">${p.subCategoryName || 'N/A'}</p>
+              <h3 class="product-name">${p.name}</h3>
+              <h4 class="product-price">₹${p.price?.toFixed(2) || '0.00'}</h4>
+            </div>
+          </div>
+          <div class="product-action d-flex flex-column gap-1">
+            ${hasSheet
+              ? `<a href="${p.datasheetUrl}" target="_blank" class="btn btn-sm btn-outline-primary">
+                  <i class="fa fa-file-pdf-o"></i> Download Datasheet
+                </a>`
+              : `<button class="btn btn-sm btn-secondary" disabled>
+                  <i class="fa fa-file-pdf-o"></i> No Datasheet
+                </button>`}
+            <button class="btn btn-sm btn-success customize-product" data-product='${JSON.stringify(p)}' data-toggle="modal" data-target="#customizeModal">
+              <i class="fa fa-cog mr-1"></i> Customize
+            </button>
+          </div>
+        `;
+        container.appendChild(productCard);
+      });
+    }
+    
+    let selectedProduct = null;
+    $('#customizeModal').on('show.bs.modal', e => {
+      selectedProduct = JSON.parse($(e.relatedTarget).attr('data-product'));
+      $('#c-prod-name').text(selectedProduct.name);
+      $('#c-qty').val(1);
+      $('#c-notes').val('');
+      const container = $('#c-specs-container').empty();
+      const specMap = {};
+      selectedProduct.specifications?.forEach(s => {
+        if (!specMap[s.key]) specMap[s.key] = new Set();
+        specMap[s.key].add(s.value);
+      });
+      Object.entries(specMap).forEach(([key, values]) => {
+        container.append(`
+          <div class="form-group">
+            <label>${key}</label>
+            <select class="form-control spec-selector" data-key="${key}">
+              ${Array.from(values).map(val => `<option value="${val}">${val}</option>`).join('')}
+            </select>
+          </div>
+        `);
+      });
+    });
+    $('#c-add-btn').click(() => {
+      const token = localStorage.getItem('userToken');
+      if (!token) {
+        alert("⚠ Please login to add items to your cart.");
+        return;
+      }
+      const qty = Math.max(1, parseInt($('#c-qty').val()));
+      const notes = $('#c-notes').val().trim();
+      const specs = [];
+      $('.spec-selector').each(function () {
+        specs.push({ key: $(this).data('key'), value: $(this).val() });
+      });
+      const payload = {
+        productId: selectedProduct.id,
+        quantity: qty,
+        notes,
+        specifications: specs
+      };
+      fetch('https://ecommercebackend-4zll.onrender.com/api/cart', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + token
+        },
+        body: JSON.stringify(payload)
+      })
+      .then(res => res.text())
+      .then(msg => {
+        $('#customizeModal').modal('hide');
+        $('body').removeClass('modal-open');
+        $('.modal-backdrop').remove();
+        alert("✅ " + msg);
+      })
+      .catch(err => {
+        console.error('❌ Error:', err);
+        alert("❌ Failed to add item to cart.");
+      });
+    });
+  </script>
+</body>
+</html>

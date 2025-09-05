@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>AEROMATX</title>
+
+  <!-- Styles -->
+  <link href="https://fonts.googleapis.com/css?family=Montserrat:400,500,700" rel="stylesheet" />
+  <link rel="stylesheet" href="css/bootstrap.min.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/assets/owl.carousel.min.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/assets/owl.theme.default.min.css" />
+  <link rel="stylesheet" href="css/font-awesome.min.css" />
+  <link rel="stylesheet" href="css/index.css" />
+  <link rel="stylesheet" href="css/satcom.css" />
+  <style>
+    .no-datasheet {
+      opacity: 0.6;
+      pointer-events: none;
+    }
+    /* application */
+
+    .category-quick-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 14px;
+  background: #f8fafc; /* light background strip */
+  padding: 14px 20px;
+  border-top: 1px solid #e5e7eb;
+}
+.category-quick-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 14px;
+  background: #f8fafc; /* light background strip */
+  padding: 14px 20px;
+  border-top: 1px solid #e5e7eb;
+}
+
+.category-quick-buttons button {
+  background: transparent;
+  color: #0f172a;
+  border: 1.8px solid #d1d5db;
+  padding: 9px 22px;
+  border-radius: 9999px; /* full pill */
+  font-weight: 700;
+  font-size: 13px;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  text-transform: uppercase;
+  transition: all 0.25s ease-in-out, box-shadow 0.25s ease-in-out;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Hover with light background + smooth shadow */
+.category-quick-buttons button:hover {
+  border-color: #1989AC;
+  color: #1989AC;
+  background: rgba(25, 137, 172, 0.08);
+  box-shadow: 0 4px 12px rgba(25, 137, 172, 0.25);
+  transform: translateY(-2px);
+}
+
+/* Active button filled with brand color */
+.category-quick-buttons button.active {
+  background: #1989AC;
+  color: white;
+  border-color: #1989AC;
+  box-shadow: 0 4px 14px rgba(25, 137, 172, 0.35);
+}
+
+/* Smooth background "wave" effect */
+.category-quick-buttons button::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: rgba(25, 137, 172, 0.12);
+  transition: left 0.3s ease;
+  z-index: 0;
+}
+
+
+.category-quick-buttons button:hover::before {
+  left: 0;
+}
+.category-quick-buttons button span {
+  position: relative;
+  z-index: 1;
+}
+.category-quick-buttons a.btn {
+  display: inline-block;
+  padding: 8px 16px;
+  background: #ccc;
+  border-radius: 4px;
+  text-decoration: none;
+  color: black;
+}
+
+  </style>
+</head>
+<body>
+  <div id="header-placeholder"></div>
+
+
+  <div class="category-quick-buttons">
+
+  <button class="active">ALL</button>
+  <a href="">
+    <button>AUTOMOTIVE</button>
+  </a>
+  <a href="">
+    <button>INDUSTRIAL</button>
+  </a>
+ <a href="">
+    <button>AEROSPACE</button>
+  </a>
+ <a href="">
+    <button>MILIGARDE</button>
+  </a>
+</div>
+
+  <div class="section">
+    <div class="container">
+      <div class="row">
+        <div class="col-md-12">
+          <div class="section-title">
+            <h3 class="title">Products by SubCategory</h3>
+          </div>
+        </div>
+        <div class="col-md-12" id="subcategory-product-groups"></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="footer-placeholder"></div>
+
+  <!-- Scripts -->
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+  <script src="js/bootstrap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/owl.carousel.min.js"></script>
+  <script src="js/jquery.zoom.min.js"></script>
+  <script src="js/navigation.js"></script>
+  <script src="js/frontend-header.js"></script>
+  <script src="js/profileBehviour.js"></script>
+
+
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const urlParams = new URLSearchParams(window.location.search);
+      const categoryId = urlParams.get("categoryId");
+      if (!categoryId) return;
+
+      fetch(`https://ecommercebackend-4zll.onrender.com/api/products/by-category/${categoryId}`)
+        .then(res => res.json())
+        .then(products => {
+          const grouped = {};
+          products.forEach(p => {
+            const subName = p.subCategoryName || 'Others';
+            if (!grouped[subName]) grouped[subName] = [];
+            grouped[subName].push(p);
+          });
+
+          const container = document.getElementById("subcategory-product-groups");
+          Object.entries(grouped).forEach(([subName, prodList]) => {
+            const section = document.createElement("div");
+            section.className = "subcat-group mb-4";
+            section.innerHTML = `<h4 class='mb-3'>${subName}</h4><div class='row'></div>`;
+
+            const row = section.querySelector(".row");
+            prodList.forEach(p => {
+              const hasSheet = !!p.datasheetUrl;
+              row.innerHTML += `
+                <div class="col-md-3">
+                  <div class="product modern-product-card">
+                    <div class="product-top-link">
+                      <div class="product-img">
+                        <img src="${p.imageUrl || './img/placeholder.png'}" alt="${p.name}" />
+                      </div>
+                      <div class="product-body">
+                        <p class="product-category">${p.subCategoryName}</p>
+                        <h3 class="product-name">${p.name}</h3>
+                        <h4 class="product-price">₹${p.price?.toFixed(2) || '0.00'}</h4>
+                      </div>
+                    </div>
+                    <div class="product-action d-flex flex-column gap-1">
+                      ${hasSheet
+                        ? `<a href="${p.datasheetUrl}" target="_blank" class="btn btn-sm btn-outline-primary">
+                            <i class="fa fa-file-pdf-o"></i> Download Datasheet
+                          </a>`
+                        : `<button class="btn btn-sm btn-secondary" disabled>
+                            <i class="fa fa-file-pdf-o"></i> No Datasheet
+                          </button>`}
+                      <button class="btn btn-sm btn-success customize-product" data-product='${JSON.stringify(p)}' data-toggle="modal" data-target="#customizeModal">
+                        <i class="fa fa-cog mr-1"></i> Customize
+                      </button>
+                    </div>
+                  </div>
+                </div>`;
+            });
+
+            container.appendChild(section);
+          });
+        })
+        .catch(err => console.error("❌ Error loading grouped products:", err));
+
+      $("#header-placeholder").load("header.html", () => {
+        try {
+          FrontendHeader?.init?.();
+        } catch (e) {
+          console.warn("⚠️ FrontendHeader is not defined");
+        }
+      });
+      $("#footer-placeholder").load("footer.html");
+    });
+  </script>
+
+  <!-- Customize Modal -->
+  <div class="modal fade" id="customizeModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-md" role="document">
+      <div class="modal-content p-3">
+        <div class="modal-header">
+          <h5 class="modal-title">Customize Product</h5>
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+        </div>
+        <div class="modal-body">
+          <p><strong id="c-prod-name"></strong></p>
+          <div id="c-specs-container"></div>
+          <div class="form-group">
+            <label>Quantity</label>
+            <input id="c-qty" type="number" class="form-control" value="1" min="1" />
+          </div>
+          <div class="form-group">
+            <label>Notes</label>
+            <textarea id="c-notes" class="form-control" placeholder="Optional notes..."></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-primary" id="c-add-btn">Add to Cart</button>
+          <button class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let selectedProduct = null;
+
+    $('#customizeModal').on('show.bs.modal', e => {
+      selectedProduct = JSON.parse($(e.relatedTarget).attr('data-product'));
+      $('#c-prod-name').text(selectedProduct.name);
+      $('#c-qty').val(1);
+      $('#c-notes').val('');
+      const container = $('#c-specs-container');
+      container.empty();
+
+      const groupedSpecs = {};
+      selectedProduct.specifications?.forEach(spec => {
+        if (!groupedSpecs[spec.key]) groupedSpecs[spec.key] = new Set();
+        groupedSpecs[spec.key].add(spec.value);
+      });
+
+      Object.entries(groupedSpecs).forEach(([key, values]) => {
+        const select = $(`
+          <div class="form-group">
+            <label>${key}</label>
+            <select class="form-control spec-selector" data-key="${key}">
+              ${Array.from(values).map(val => `<option value="${val}">${val}</option>`).join('')}
+            </select>
+          </div>
+        `);
+        container.append(select);
+      });
+    });
+
+    $('#c-add-btn').click(function () {
+  const qty = Math.max(1, parseInt($('#c-qty').val()));
+  const notes = $('#c-notes').val().trim();
+
+  const specs = [];
+  $('.spec-selector').each(function () {
+    const key = $(this).data('key');
+    const value = $(this).val();
+    specs.push({ key, value });
+  });
+
+  const payload = {
+    productId: selectedProduct.id,
+    quantity: qty,
+    notes,
+    specifications: specs
+  };
+
+  fetch('https://ecommercebackend-4zll.onrender.com/api/cart', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer ' + localStorage.getItem('userToken')
+    },
+    body: JSON.stringify(payload)
+  })
+    .then(async res => {
+      const contentType = res.headers.get('content-type');
+      if (contentType && contentType.includes('application/json')) {
+        const data = await res.json();
+        console.log('✅ Added to cart (JSON):', data);
+      } else {
+        const text = await res.text();
+        console.log('✅ Added to cart (Text):', text);
+      }
+
+      // ✅ Close modal and clear backdrop
+      $('#customizeModal').modal('hide');
+      $('body').removeClass('modal-open');
+      $('.modal-backdrop').remove();
+
+      // ✅ Show a toast or alert
+      alert("✅ Item successfully added to cart!");
+
+      // ✅ Optional: Refresh the page or section (uncomment as needed)
+      // location.reload(); // Uncomment to refresh the whole page
+
+    })
+    .catch(err => {
+      console.error('❌ Error adding to cart:', err);
+      alert("⚠️ Please login to add items to your cart.");
+    });
+});
+
+
+
+
+
+  
+  </script>
+</body>
+</html>

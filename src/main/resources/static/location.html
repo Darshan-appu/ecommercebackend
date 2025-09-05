@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Select Your Region | AeroMatx</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(135deg, #f8fbff, #e6f2ff);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      color: #2c3e50;
+    }
+
+    main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 20px;
+    }
+
+    /* AeroMatx Logo */
+    .new-logo {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      font-weight: 1000;
+      font-size: 50px;
+      letter-spacing: 1px;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      margin-bottom: 40px;
+    }
+    .minimal-aero { color: #1898CA; font-weight: 700; letter-spacing: 2px; }
+    .minimal-mat { color: #555; font-weight: 600; letter-spacing: 2px; }
+    .minimal-x {
+      color: #1898CA; font-weight: 900; font-size: 20px;
+      margin-left: 8px; border: 2px solid #1898CA;
+      width: 50px; height: 50px;
+      display: flex; align-items: center; justify-content: center;
+      border-radius: 50%; background: transparent;
+      transition: all 0.3s ease;
+    }
+    .new-logo:hover .minimal-x { background: #1898CA; color: #fff; transform: rotate(180deg) scale(1.1); }
+
+    /* Title */
+    .title { font-size: 2rem; font-weight: 700; margin-bottom: 10px; text-align: center; }
+    .subtitle { font-size: 1rem; font-weight: 400; text-align: center; color: #6b7b8c; margin-bottom: 40px; max-width: 500px; }
+
+    /* Cards Container */
+    .location-selection {
+      display: flex;
+      gap: 2rem;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin-bottom: 30px;
+    }
+
+    /* Card */
+    .location-box {
+      background: #fff;
+      border-radius: 16px;
+      width: 300px;
+      overflow: hidden;
+      box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+      transition: all 0.3s ease;
+    }
+    .location-box:hover { transform: translateY(-6px); box-shadow: 0 16px 40px rgba(52,152,219,0.25); }
+
+    /* Image Container */
+    .image-container {
+      position: relative;
+      height: 180px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, #e0f2ff 0%, #ffffff 100%);
+    }
+    .location-pin {
+      width: 90px; height: 90px;
+      display: flex; align-items: center; justify-content: center;
+      border-radius: 50% 50% 50% 0;
+      transform: rotate(-45deg);
+      transition: all 0.3s ease;
+      background: #fff;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+    }
+    .location-box:hover .location-pin { transform: rotate(-45deg) scale(1.1); }
+
+    /* Flags */
+    .india-flag {
+      width: 50px; height: 35px;
+      border-radius: 4px;
+      background: linear-gradient(to bottom, #ff9933 33%, #fff 33%, #fff 66%, #138808 66%);
+      position: relative;
+      transform: rotate(45deg);
+      border: 1px solid #ccc;
+    }
+    .india-flag::before {
+      content: '☸';
+      position: absolute; top: 50%; left: 50%;
+      transform: translate(-50%, -50%) rotate(-45deg);
+      color: #000080; font-size: 14px;
+    }
+
+    .uk-flag {
+      width: 50px; height: 35px;
+      border-radius: 4px;
+      background: #012169;
+      position: relative;
+      transform: rotate(45deg);
+      border: 1px solid #ccc;
+    }
+    .uk-flag::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: 
+        linear-gradient(to right, #fff 30%, transparent 30%, transparent 70%, #fff 70%),
+        linear-gradient(to bottom, #fff 30%, transparent 30%, transparent 70%, #fff 70%);
+    }
+    .uk-flag::after {
+      content: '';
+      position: absolute; inset: 0;
+      background: 
+        linear-gradient(to right, #c8102e 40%, transparent 40%, transparent 60%, #c8102e 60%),
+        linear-gradient(to bottom, #c8102e 40%, transparent 40%, transparent 60%, #c8102e 60%);
+    }
+
+    /* Content */
+    .location-content { padding: 1.5rem; text-align: center; }
+    .location-name { font-size: 1.3rem; font-weight: 600; margin-bottom: 0.5rem; }
+    .location-description { font-size: 0.95rem; color: #7f8c8d; margin-bottom: 1.5rem; line-height: 1.5; }
+
+    /* Button */
+    .location-btn {
+      display: inline-flex; align-items: center; justify-content: center;
+      padding: 12px 20px;
+      font-weight: 600; color: #fff;
+      background: linear-gradient(135deg, #3498db, #1abc9c);
+      border-radius: 8px; text-decoration: none;
+      transition: all 0.3s ease;
+    }
+    .location-btn:hover { background: linear-gradient(135deg, #2980b9, #16a085); box-shadow: 0 8px 20px rgba(52,152,219,0.35); }
+    .location-btn svg { margin-left: 8px; width: 16px; height: 16px; transition: transform 0.3s ease; }
+    .location-btn:hover svg { transform: translateX(4px); }
+
+    /* Footer */
+    footer {
+      background: #f0f4f8;
+      padding: 20px;
+      text-align: center;
+      font-size: 0.9rem;
+      color: #6b7b8c;
+      border-top: 1px solid #e1e6eb;
+    }
+    footer a {
+      color: #1898CA;
+      text-decoration: none;
+      margin: 0 10px;
+    }
+    footer a:hover { text-decoration: underline; }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .location-selection { flex-direction: column; gap: 1.5rem; }
+      .location-box { width: 100%; max-width: 320px; }
+    }
+  </style>
+</head>
+<body>
+
+  <main>
+    <!-- Logo -->
+    <!-- <a href="index.html" class="new-logo">
+      <span class="minimal-aero">AERO</span>
+      <span class="minimal-mat">MAT</span>
+      <span class="minimal-x">X</span>
+    </a> -->
+
+    <!-- Title -->
+    <h1 class="title">Choose Your Region</h1>
+    <p class="subtitle">Select your preferred region to access localized content, pricing, and support tailored to your market</p>
+
+    <!-- Cards -->
+    <div class="location-selection">
+      <!-- India -->
+      <div class="location-box">
+        <div class="image-container">
+          <div class="location-pin">
+            <div class="india-flag"></div>
+          </div>
+        </div>
+        <div class="location-content">
+          <h2 class="location-name">India</h2>
+          <p class="location-description">Access Indian market with local pricing and support in INR</p>
+          <a href="index.html" class="location-btn">
+            Enter India Site
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M13 7l5 5m0 0l-5 5m5-5H6"></path></svg>
+          </a>
+        </div>
+      </div>
+
+      <!-- UK -->
+      <div class="location-box">
+        <div class="image-container">
+          <div class="location-pin">
+            <div class="uk-flag"></div>
+          </div>
+        </div>
+        <div class="location-content">
+          <h2 class="location-name">United Kingdom</h2>
+          <p class="location-description">Experience European excellence with UK standards and GBP pricing</p>
+          <a href="index.html" class="location-btn">
+            Enter UK Site
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M13 7l5 5m0 0l-5 5m5-5H6"></path></svg>
+          </a>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer>
+    © 2025 AeroMatx. All rights reserved. 
+    <a href="#">Privacy Policy</a> | 
+    <a href="#">Terms of Service</a> | 
+    <a href="#">Contact</a>
+  </footer>
+
+</body>
+</html>

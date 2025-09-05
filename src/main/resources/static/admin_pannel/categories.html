@@ -7,146 +7,18 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"/>
 
   <link rel="stylesheet" href="css/style.css"/>
-    <style>
+   <style>
     .error-msg {
     color: red;
     font-size: 12px;
     margin-top: 4px;
     display: none;
   }
-    .form-text {
+   .form-text {
     color: #6c757d;
     font-size: 12px;
     margin-top: 2px;
   }
-    .modal {
-        display: none; /* Hidden by default */
-        position: fixed; /* Stay in place */
-        z-index: 1000; /* Sit on top */
-        left: 0;
-        top: 0;
-        width: 100%; /* Full width */
-        height: 100%; /* Full height */
-        overflow: auto; /* Enable scroll if needed */
-        background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
-        justify-content: center; /* Center horizontally */
-        align-items: center; /* Center vertically */
-    }
-
-    .modal-content {
-        background-color: #fefefe;
-        margin: auto;
-        padding: 20px;
-        border: 1px solid #888;
-        width: 80%; /* Could be more specific like max-width: 500px; */
-        box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2), 0 6px 20px 0 rgba(0,0,0,0.19);
-        animation-name: animatetop;
-        animation-duration: 0.4s
-    }
-
-    /* Add Animation */
-    @keyframes animatetop {
-        from {top: -300px; opacity: 0}
-        to {top: 0; opacity: 1}
-    }
-
-    .close {
-        color: #aaa;
-        float: right;
-        font-size: 28px;
-        font-weight: bold;
-    }
-
-    .close:hover,
-    .close:focus {
-        color: black;
-        text-decoration: none;
-        cursor: pointer;
-    }
-
-    .modal-header {
-        padding: 2px 16px;
-        background-color: #f2f2f2; /* Light background for header */
-        color: #333;
-        border-bottom: 1px solid #ddd;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 15px;
-    }
-
-    .modal-body {
-        padding: 2px 16px;
-    }
-
-    .modal-footer {
-        padding: 10px 16px;
-        background-color: #f2f2f2; /* Light background for footer */
-        border-top: 1px solid #ddd;
-        text-align: right;
-        margin-top: 15px;
-    }
-
-    /* Basic form styling (adjust as per your existing style.css) */
-    .form-group {
-        margin-bottom: 15px;
-    }
-    .form-control {
-        width: 100%;
-        padding: 8px;
-        border: 1px solid #ccc;
-        border-radius: 4px;
-        box-sizing: border-box; /* Include padding in width */
-    }
-    .form-control-file {
-        display: block; /* Make file input take full width */
-        margin-top: 5px;
-    }
-    .btn {
-        padding: 8px 15px;
-        border-radius: 4px;
-        cursor: pointer;
-        border: none;
-    }
-    .btn-primary {
-        background-color: #007bff;
-        color: white;
-    }
-    .btn-success {
-        background-color: #28a745;
-        color: white;
-    }
-    .btn-danger {
-        background-color: #dc3545;
-        color: white;
-    }
-    .btn-info {
-        background-color: #17a2b8;
-        color: white;
-    }
-    .btn-warning {
-        background-color: #ffc107;
-        color: #212529;
-    }
-    .status {
-        display: inline-block;
-        padding: .25em .4em;
-        font-size: 75%;
-        font-weight: 700;
-        line-height: 1;
-        text-align: center;
-        white-space: nowrap;
-        vertical-align: baseline;
-        border-radius: .25rem;
-    }
-    .status.active {
-        color: #fff;
-        background-color: #28a745; /* Green */
-    }
-    .status.inactive {
-        color: #fff;
-        background-color: #6c757d; /* Gray */
-    }
   </style>
 </head>
 <body>
@@ -186,6 +58,7 @@
       </div>
     </div>
   </div>
+  <!-- ============= ADD CATEGORY MODAL ============= -->
   <div class="modal" id="addCategoryModal">
     <div class="modal-content">
       <div class="modal-header">
@@ -203,6 +76,8 @@
           <div class="form-group">
             <label for="categorySlug">Slug</label>
             <input type="text" id="categorySlug" class="form-control">
+
+
           </div>
           <div class="form-group">
             <label for="categoryDescription">Description</label>
@@ -233,6 +108,7 @@
       </div>
     </div>
   </div>
+  <!-- ============= EDIT CATEGORY MODAL ============= -->
   <div class="modal" id="editCategoryModal">
     <div class="modal-content">
       <div class="modal-header">
@@ -262,13 +138,16 @@
               <option value="Active">Active</option>
               <option value="Inactive">Inactive</option>
             </select>
+            <div class="form-group">
+  <label for="editCategoryImage">Change Image</label>
+  <input type="file" id="editCategoryImage" accept="image/*" class="form-control">
+  <small class="form-text">Max size: 100 KB | Ratio: 1:1 (Square)</small>
+  <div id="editCategoryImageError" class="error-msg"></div>
+</div>
+
             <div id="categoryStatusError" class="error-msg"></div>
           </div>
-          <div class="form-group">
-            <label for="editCategoryImage">Update Image (optional):</label>
-            <input type="file" id="editCategoryImage" accept="image/*" class="form-control" />
-            <small class="form-text">Max size: 100 KB | Ratio: 1:1 (Square)</small>
-          </div>
+          <!-- Optional: Image update in edit modal -->
         </form>
       </div>
       <div class="modal-footer">
@@ -277,6 +156,7 @@
       </div>
     </div>
   </div>
+  <!-- Scripts -->
   <script src="js/main.js"></script>
   <script src="js/categories.js"></script>
   <script src="js/sidebar.js"></script>

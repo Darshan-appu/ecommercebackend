@@ -1,0 +1,948 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vendors | E-commerce Admin</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        /* Specific styles for vendors.html */
+        .vendors-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        .vendors-table th, .vendors-table td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+            vertical-align: middle;
+        }
+        .vendors-table th {
+            background-color: #f2f2f2;
+            font-weight: bold;
+        }
+        .vendors-table tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        .vendors-table tr:hover {
+            background-color: #f1f1f1;
+        }
+        .action-buttons button {
+            margin-right: 5px;
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.85em;
+        }
+        .btn-edit {
+            background-color: #007bff;
+            color: white;
+            border: none;
+        }
+        .btn-delete {
+            background-color: #dc3545;
+            color: white;
+            border: none;
+        }
+        .btn-view {
+            background-color: #6c757d;
+            color: white;
+            border: none;
+        }
+        .modal {
+            display: none; /* Hidden by default */
+            position: fixed; /* Stay in place */
+            z-index: 1001; /* Sit on top */
+            left: 0;
+            top: 0;
+            width: 100%; /* Full width */
+            height: 100%; /* Full height */
+            overflow: auto; /* Enable scroll if needed */
+            background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-content {
+            background-color: #fefefe;
+            margin: auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+            max-width: 700px;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            position: relative;
+            animation-name: animatetop;
+            animation-duration: 0.4s
+        }
+        @keyframes animatetop {
+            from {top: -300px; opacity: 0}
+            to {top: 0; opacity: 1}
+        }
+        .close-button {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+        .close-button:hover,
+        .close-button:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        .form-group input, .form-group textarea, .form-group select {
+            width: calc(100% - 20px); /* Adjust for padding */
+            padding: 8px 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .form-group .radio-group {
+            display: flex;
+            gap: 15px;
+            margin-top: 5px;
+        }
+        .form-group .radio-option {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .btn-container {
+            text-align: right;
+            margin-top: 20px;
+        }
+        .btn-container button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1em;
+        }
+        .btn-save {
+            background-color: #28a745;
+            color: white;
+        }
+        .btn-cancel {
+            background-color: #6c757d;
+            color: white;
+            margin-left: 10px;
+        }
+        .status-badge {
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 0.8em;
+            /* color: #ffff; */
+            font-weight: bold;
+        }
+        .status-Pending { background-color: #ffc107; } /* Orange */
+        .status-Approved { background-color: #28a745; } /* Green */
+        .status-Rejected { background-color: #dc3545; } /* Red */
+
+        /* Message Box */
+        .message-box {
+            display: none;
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 15px 30px;
+            border-radius: 8px;
+            font-weight: bold;
+            color: white;
+            text-align: center;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            z-index: 1002;
+            animation: fadeInOut 3s forwards;
+        }
+
+        .message-box.success { background-color: #28a745; } /* Green */
+        .message-box.error { background-color: #dc3545; } /* Red */
+
+        @keyframes fadeInOut {
+            0% { opacity: 0; transform: translateX(-50%) translateY(-20px); }
+            10% { opacity: 1; transform: translateX(-50%) translateY(0); }
+            90% { opacity: 1; transform: translateX(-50%) translateY(0); }
+            100% { opacity: 0; transform: translateX(-50%) translateY(-20px); }
+        }
+
+        .spinner {
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            border-left-color: #D19C97;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 10px;
+            display: none; /* Hidden by default */
+        }
+
+        @keyframes spin {a
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+
+.image-row {
+    display: flex;
+    justify-content: center;   /* center horizontally */
+    gap: 20px;                 /* spacing between images */
+    margin-bottom: 15px;
+}
+
+.image-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.product-image {
+    max-width: 120px;
+    max-height: 120px;
+    border-radius: 8px;
+    margin-bottom: 8px;
+}
+
+
+    </style>
+</head>
+<body>
+    <div id="sidebar-placeholder"></div>
+
+    <div class="main">
+        <div id="top-navbar-placeholder"></div>
+
+        <div class="main-container">
+            <div class="page-header">
+                <h2>Product Requests</h2>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h3>Pending Product Requests</h3>
+                </div>
+                <div class="table-responsive">
+                    <table class="products-table">
+                        <thead>
+                            <tr>
+                                <th>Product</th>
+                                <th>Vendor</th>
+                                <th>Category</th>
+                                <th>Status</th>
+                                <th>Submitted At</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="productTableBody"></tbody>
+                    </table>
+                    <div id="noDataMessage" style="text-align: center; padding: 20px; display: none;">
+                        No product requests to display.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Product Modal -->
+    <div id="productModal" class="modal">
+        <div class="modal-content">
+            <span class="close-button">&times;</span>
+            <h3 id="modalTitle">Product Details</h3>
+            <form id="productForm">
+                <input type="hidden" id="productId">
+
+
+
+               <!-- Product Image -->
+<div class="flex-row" style="display: flex; flex-direction: row; justify-content: center; gap: 30px; flex-wrap: wrap;">
+
+    <!-- Category Image -->
+<!-- Category Image -->
+<div class="image-container" style="text-align: center;">
+  <label for="categoryImage" style="display:block; font-weight:600; margin-bottom:8px;">
+    Category Image
+  </label>
+  <img id="categoryImage" src="" alt="Category Image"
+       class="product-image"
+       style="width:120px; height:120px; object-fit:cover; border-radius:8px; border:1px solid #ddd; padding:4px;">
+  <button type="button" class="btn btn-edit-small" id="editCategoryImageBtn" style="margin-top:6px;">
+    Edit
+  </button>
+  <!-- Hidden file input -->
+  <input type="file" id="categoryImageInput" accept="image/*" style="display:none;">
+</div>
+
+<!-- Product Image -->
+<div class="image-container" style="text-align: center;">
+  <label for="productImage" style="display:block; font-weight:600; margin-bottom:8px;">
+    Product Image
+  </label>
+  <img id="productImage" src="" alt="Product Image"
+       class="product-image"
+       style="width:120px; height:120px; object-fit:cover; border-radius:8px; border:1px solid #ddd; padding:4px;">
+  <button type="button" class="btn btn-edit-small" id="editImageBtn" style="margin-top:6px;">
+    Edit
+  </button>
+  <!-- Hidden file input -->
+  <input type="file" id="productImageInput" accept="image/*" style="display:none;">
+</div>
+
+<!-- <script>
+  // Category Image Edit
+  document.getElementById("editCategoryImageBtn").addEventListener("click", () => {
+    document.getElementById("categoryImageInput").click();
+  });
+
+  document.getElementById("categoryImageInput").addEventListener("change", (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        document.getElementById("categoryImage").src = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
+  });
+
+  // Product Image Edit
+  document.getElementById("editImageBtn").addEventListener("click", () => {
+    document.getElementById("productImageInput").click();
+  });
+
+  document.getElementById("productImageInput").addEventListener("change", (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        document.getElementById("productImage").src = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
+  });
+</script> -->
+
+
+</div>
+
+<input type="hidden" id="productId" />
+<textarea id="rejectReason"></textarea>
+
+                <!-- Product Name -->
+                <div class="form-group">
+                    <label for="productName">Product Name</label>
+                    <input type="text" id="productName" name="productName" readonly>
+                    <button type="button" class="btn btn-edit-small" id="editNameBtn">Edit</button>
+                </div>
+
+                <!-- Description -->
+                <div class="form-group">
+                    <label for="description">Description</label>
+                    <textarea id="description" name="description" rows="4" readonly></textarea>
+                                        <button type="button" class="btn btn-edit-small" id="editNameBtn">Edit</button>
+
+                </div>
+
+                <!-- Price -->
+                <div class="form-group">
+                    <label for="price">Price ($)</label>
+                    <input type="number" id="price" name="price" step="0.01" readonly>
+                                        <button type="button" class="btn btn-edit-small" id="editNameBtn">Edit</button>
+
+                </div>
+
+                <!-- Stock -->
+                <div class="form-group">
+                    <label for="stock">Stock</label>
+                    <input type="number" id="stock" name="stock" readonly>
+                                        <button type="button" class="btn btn-edit-small" id="editNameBtn">Edit</button>
+
+                </div>
+
+                <!-- Category -->
+<!-- <div class="form-group">
+  <label for="category">Category</label>
+  <div style="display: flex; align-items: center; gap:8px;"> -->
+    <!-- Normal (selected) category -->
+    <!-- <input type="text" id="categoryView" readonly style="flex:1;"> -->
+
+    <!-- Suggested -->
+    <!-- <span id="suggestedCategoryBadge" class="suggested-category-badge" style="display:none;">Suggested</span>
+    <select id="suggestedCategorySelect" style="display:none; flex:1;"></select>
+  </div>
+</div> -->
+
+<!-- Sub-Category -->
+<!-- <div class="form-group">
+  <label for="subcategory">Sub-Category</label>
+  <div style="display: flex; align-items: center; gap:8px;"> -->
+    <!-- Normal (selected) subcategory -->
+    <!-- <input type="text" id="subcategoryView" readonly style="flex:1;"> -->
+
+    <!-- Suggested -->
+    <!-- <span id="suggestedSubCategoryBadge" class="suggested-category-badge" style="display:none;">Suggested</span>
+    <select id="suggestedSubCategorySelect" style="display:none; flex:1;"></select>
+  </div>
+</div> -->
+
+
+<!-- Category -->
+<div class="form-group">
+  <label for="category">Category</label>
+  <div style="display: flex; align-items: center; gap:8px;">
+    <!-- Normal (selected) category (read-only) -->
+    <input type="text" id="categoryView" readonly style="flex:1;">
+
+    <!-- Suggested (Editable dropdown) -->
+    <span id="suggestedCategoryBadge" class="suggested-category-badge" style="display:none;">Suggested</span>
+    <select id="suggestedCategorySelect" style="display:none; flex:1;">
+      <option value="">-- Select Category --</option>
+    </select>
+  </div>
+</div>
+
+<!-- Sub-Category -->
+<div class="form-group">
+  <label for="subcategory">Sub-Category</label>
+  <div style="display: flex; align-items: center; gap:8px;">
+    <!-- Normal (selected) subcategory (read-only) -->
+    <input type="text" id="subcategoryView" readonly style="flex:1;">
+
+    <!-- Suggested (Editable dropdown) -->
+    <span id="suggestedSubCategoryBadge" class="suggested-category-badge" style="display:none;">Suggested</span>
+    <select id="suggestedSubCategorySelect" style="display:none; flex:1;">
+      <option value="">-- Select Sub-Category --</option>
+    </select>
+  </div>
+</div>
+
+
+
+                <script>
+// // --- Open Product Modal
+// window.openProductModal = (id) => {
+//   const product = products.find(p => p.id === id);
+//   if (!product) return;
+
+//   // Basic fields
+//   elements.productId.value = product.id;
+//   elements.productName.value = product.productName;
+//   elements.description.value = product.description;
+//   elements.price.value = product.price;
+//   elements.stock.value = product.stock;
+//   elements.productImage.src = product.productImageUrl;
+//   elements.categoryImage.src = product.categoryImageUrl;
+
+//   // ✅ CATEGORY handling
+//   if (product.suggestedCategory) {
+//     // Show suggested with dropdown
+//     elements.categoryView.style.display = "none";
+//     elements.suggestedCategoryBadge.style.display = "inline-block";
+//     elements.suggestedCategorySelect.style.display = "inline-block";
+
+//     elements.suggestedCategorySelect.innerHTML = `
+//       <option selected>${product.suggestedCategory}</option>
+//     `;
+//   } else {
+//     // Show selected category
+//     elements.suggestedCategoryBadge.style.display = "none";
+//     elements.suggestedCategorySelect.style.display = "none";
+//     elements.categoryView.style.display = "inline-block";
+//     elements.categoryView.value = product.selectedCategory; // ⚠️ needs mapping if it's ID
+//   }
+
+//   // ✅ SUBCATEGORY handling
+//   if (product.suggestedSubCategory) {
+//     elements.subcategoryView.style.display = "none";
+//     elements.suggestedSubCategoryBadge.style.display = "inline-block";
+//     elements.suggestedSubCategorySelect.style.display = "inline-block";
+
+//     elements.suggestedSubCategorySelect.innerHTML = `
+//       <option selected>${product.suggestedSubCategory}</option>
+//     `;
+//   } else {
+//     elements.suggestedSubCategoryBadge.style.display = "none";
+//     elements.suggestedSubCategorySelect.style.display = "none";
+//     elements.subcategoryView.style.display = "inline-block";
+//     elements.subcategoryView.value = product.selectedSubCategory; // ⚠️ needs mapping if it's ID
+//   }
+
+//   // Specifications
+//   renderSpecifications(product.specifications || {});
+
+//   elements.productModal.style.display = 'flex';
+// };
+
+
+
+// Load categories into Suggested Category dropdown
+async function loadSuggestedCategories() {
+  try {
+    const res = await fetch("/api/categories"); // ✅ frontend endpoint for active categories
+    if (!res.ok) throw new Error("Failed to fetch categories");
+
+    const categories = await res.json();
+    const categorySelect = document.getElementById("suggestedCategorySelect");
+
+    // Reset options
+    categorySelect.innerHTML = `<option value="">-- Select Category --</option>`;
+
+    // Populate categories
+    categories.forEach(cat => {
+      const option = document.createElement("option");
+      option.value = cat.id;   // store category id
+      option.textContent = cat.name;
+      categorySelect.appendChild(option);
+    });
+
+    // Show dropdown
+    document.getElementById("suggestedCategoryBadge").style.display = "inline-block";
+    categorySelect.style.display = "block";
+
+  } catch (err) {
+    console.error("Error loading categories:", err);
+  }
+}
+
+// Load subcategories when a category is selected
+async function loadSuggestedSubCategories(categoryId) {
+  try {
+    const res = await fetch(`/api/subcategories/by-category/${categoryId}`);
+    if (!res.ok) throw new Error("Failed to fetch subcategories");
+
+    const subcategories = await res.json();
+    const subCategorySelect = document.getElementById("suggestedSubCategorySelect");
+
+    // Reset options
+    subCategorySelect.innerHTML = `<option value="">-- Select Sub-Category --</option>`;
+
+    // Populate subcategories
+    subcategories.forEach(sub => {
+      const option = document.createElement("option");
+      option.value = sub.id;   // store subcategory id
+      option.textContent = sub.name;
+      subCategorySelect.appendChild(option);
+    });
+
+    // Show dropdown
+    document.getElementById("suggestedSubCategoryBadge").style.display = "inline-block";
+    subCategorySelect.style.display = "block";
+
+  } catch (err) {
+    console.error("Error loading subcategories:", err);
+  }
+}
+
+// When Suggested Category changes → load Subcategories
+document.getElementById("suggestedCategorySelect").addEventListener("change", function () {
+  const categoryId = this.value;
+  if (categoryId) {
+    loadSuggestedSubCategories(categoryId);
+  } else {
+    document.getElementById("suggestedSubCategorySelect").innerHTML = "";
+    document.getElementById("suggestedSubCategorySelect").style.display = "none";
+    document.getElementById("suggestedSubCategoryBadge").style.display = "none";
+  }
+});
+
+                </script>
+
+              <!-- Specifications -->
+<!-- Specifications -->
+<div id="specContainer" class="form-group">
+  <label>Specifications</label>
+  <!-- Dynamic fields will be inserted here -->
+</div>
+
+
+
+                <!-- Rejection Reason -->
+                <div id="rejectionReasonGroup" class="form-group rejection-reason-group">
+                    <label for="rejectionReason">Reason for Rejection</label>
+                    <textarea id="rejectionReason" name="rejectionReason" rows="3"></textarea>
+                </div>
+
+<div class="modal-buttons">
+    <button type="button" class="btn btn-save-modal" id="saveBtn" style="display:none;">Save</button>
+    <button type="button" class="btn btn-approve" id="approveBtn">Approve</button>
+    <button type="button" class="btn btn-reject" id="rejectBtn">Reject</button>
+    <button type="button" class="btn btn-cancel-modal">Cancel</button>
+</div>
+
+                <div class="modal-upload" style="margin-top: 10px; text-align: center;">
+    <button type="button" id="uploadBtn" 
+        style="background-color: green; color: white; padding: 8px 16px; border: none; border-radius: 5px; cursor: pointer;">
+        Upload
+    </button>
+</div>
+            </form>
+        </div>
+    </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const apiUrl = "https://ecommercebackend-4zll.onrender.com/api/admin/vendors/product-requests";
+  const token = localStorage.getItem("adminToken"); // 🔑 fetch token from storage
+
+  const elements = {
+    productTableBody: document.getElementById('productTableBody'),
+    noDataMessage: document.getElementById('noDataMessage'),
+    productModal: document.getElementById('productModal'),
+    closeButton: document.querySelector('.close-button'),
+    cancelButton: document.querySelector('.btn-cancel-modal'),
+    saveBtn: document.getElementById('saveBtn'),
+
+    // Fields
+    productId: document.getElementById('productId'),
+    productName: document.getElementById('productName'),
+    description: document.getElementById('description'),
+    price: document.getElementById('price'),
+    stock: document.getElementById('stock'),
+    productImage: document.getElementById('productImage'),
+    categoryImage: document.getElementById('categoryImage'),
+
+    // Edit buttons
+    editNameBtn: document.getElementById('editNameBtn'),
+    editImageBtn: document.getElementById('editImageBtn'),
+    editCategoryImageBtn: document.getElementById('editCategoryImageBtn'),
+
+    // Hidden file inputs (add these in your HTML next to the buttons)
+    productImageInput: document.getElementById('productImageInput'),
+    categoryImageInput: document.getElementById('categoryImageInput'),
+
+    // Suggested + selected category/subcategory
+    suggestedCategoryBadge: document.getElementById('suggestedCategoryBadge'),
+    suggestedCategorySelect: document.getElementById('suggestedCategorySelect'),
+    suggestedSubCategoryBadge: document.getElementById('suggestedSubCategoryBadge'),
+    suggestedSubCategorySelect: document.getElementById('suggestedSubCategorySelect'),
+
+    // Selected category/subcategory view fields
+    categoryView: document.getElementById('categoryView'),
+    subcategoryView: document.getElementById('subcategoryView'),
+  };
+
+  let products = []; // will hold API data
+
+  // --- Fetch product requests from API
+  async function loadProducts() {
+    try {
+      const res = await fetch(apiUrl, {
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}` // ✅ send token
+        }
+      });
+
+      if (!res.ok) {
+        throw new Error("Failed to fetch: " + res.status);
+      }
+
+      products = await res.json();
+      renderProductRequests(products);
+    } catch (err) {
+      console.error("Error fetching products:", err);
+      elements.noDataMessage.style.display = 'block';
+    }
+  }
+
+  // --- Render product requests
+  function renderProductRequests(products) {
+    elements.productTableBody.innerHTML = '';
+    if (!products.length) {
+      elements.noDataMessage.style.display = 'block';
+      return;
+    }
+    elements.noDataMessage.style.display = 'none';
+
+    products.forEach(product => {
+      const row = document.createElement('tr');
+      row.innerHTML = `
+        <td>${product.productName}</td>
+        <td>${product.vendorEmail}</td>
+        <td>${product.selectedCategory || "others"}</td>
+        <td><span class="status-badge status-${product.status}">${product.status}</span></td>
+        <td>${new Date(product.submittedAt).toLocaleDateString()}</td>
+        <td><button class="btn btn-view" onclick="openProductModal(${product.id})">View</button></td>
+      `;
+      elements.productTableBody.appendChild(row);
+    });
+  }
+
+  // --- Open Product Modal
+  window.openProductModal = (id) => {
+    const product = products.find(p => p.id === id);
+    if (!product) return;
+
+    // Basic fields
+    elements.productId.value = product.id;
+    elements.productName.value = product.productName;
+    elements.description.value = product.description;
+    elements.price.value = product.price;
+    elements.stock.value = product.stock;
+    elements.productImage.src = product.productImageUrl;
+    elements.categoryImage.src = product.categoryImageUrl;
+
+    // ✅ Selected Category/Subcategory
+    elements.categoryView.value = product.selectedCategory || "";
+    elements.subcategoryView.value = product.selectedSubCategory || "";
+
+    // ✅ Suggested Category
+    if (product.suggestedCategory) {
+      elements.suggestedCategoryBadge.style.display = 'inline-block';
+      elements.suggestedCategorySelect.style.display = 'inline-block';
+      elements.suggestedCategorySelect.innerHTML =
+        `<option selected>${product.suggestedCategory}</option>`;
+    } else {
+      elements.suggestedCategoryBadge.style.display = 'none';
+      elements.suggestedCategorySelect.style.display = 'none';
+    }
+
+    // ✅ Suggested SubCategory
+    if (product.suggestedSubCategory) {
+      elements.suggestedSubCategoryBadge.style.display = 'inline-block';
+      elements.suggestedSubCategorySelect.style.display = 'inline-block';
+      elements.suggestedSubCategorySelect.innerHTML =
+        `<option selected>${product.suggestedSubCategory}</option>`;
+    } else {
+      elements.suggestedSubCategoryBadge.style.display = 'none';
+      elements.suggestedSubCategorySelect.style.display = 'none';
+    }
+
+    // Specifications
+    renderSpecifications(product.specifications || {});
+
+    elements.productModal.style.display = 'flex';
+  };
+
+  // --- Render specifications into form
+  function renderSpecifications(specs) {
+    let specContainer = document.getElementById('specContainer');
+    if (!specContainer) {
+      specContainer = document.createElement('div');
+      specContainer.id = 'specContainer';
+      specContainer.className = 'form-group';
+      specContainer.innerHTML = `<label>Specifications</label>`;
+      document.getElementById('productForm').appendChild(specContainer);
+    }
+    specContainer.innerHTML = `<label>Specifications</label>`;
+    Object.entries(specs).forEach(([key, value]) => {
+      const row = document.createElement('div');
+      row.style.display = "flex";
+      row.style.gap = "10px";
+      row.style.marginBottom = "6px";
+      row.innerHTML = `
+        <input type="text" class="spec-key" value="${key}" style="flex:1;" />
+        <input type="text" class="spec-value" value="${value}" style="flex:1;" />
+      `;
+      specContainer.appendChild(row);
+    });
+
+    // Add new spec button
+    const addBtn = document.createElement('button');
+    addBtn.type = "button";
+    addBtn.textContent = "+ Add Specification";
+    addBtn.className = "btn btn-edit-small";
+    addBtn.onclick = () => {
+      const row = document.createElement('div');
+      row.style.display = "flex";
+      row.style.gap = "10px";
+      row.style.marginBottom = "6px";
+      row.innerHTML = `
+        <input type="text" class="spec-key" placeholder="Key" style="flex:1;" />
+        <input type="text" class="spec-value" placeholder="Value" style="flex:1;" />
+      `;
+      specContainer.insertBefore(row, addBtn);
+    };
+    specContainer.appendChild(addBtn);
+  }
+
+  // --- Close Modal
+  elements.closeButton.addEventListener('click', () => elements.productModal.style.display = 'none');
+  elements.cancelButton.addEventListener('click', () => elements.productModal.style.display = 'none');
+
+  // --- Make fields editable
+  function makeEditable(field) {
+    field.readOnly = false;
+    field.focus();
+    elements.saveBtn.style.display = 'inline-block';
+    field.addEventListener('blur', () => { field.readOnly = true; }, { once: true });
+  }
+  elements.editNameBtn.addEventListener('click', () => makeEditable(elements.productName));
+  elements.description.addEventListener('click', () => makeEditable(elements.description));
+  elements.price.addEventListener('click', () => makeEditable(elements.price));
+  elements.stock.addEventListener('click', () => makeEditable(elements.stock));
+
+  // --- Image editing logic
+  elements.editImageBtn.addEventListener("click", () => {
+    elements.productImageInput.click();
+  });
+  elements.productImageInput.addEventListener("change", (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        elements.productImage.src = e.target.result;
+        elements.saveBtn.style.display = "inline-block"; // show save button
+      };
+      reader.readAsDataURL(file);
+    }
+  });
+
+  elements.editCategoryImageBtn.addEventListener("click", () => {
+    elements.categoryImageInput.click();
+  });
+  elements.categoryImageInput.addEventListener("change", (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        elements.categoryImage.src = e.target.result;
+        elements.saveBtn.style.display = "inline-block"; // show save button
+      };
+      reader.readAsDataURL(file);
+    }
+  });
+
+  // --- Save API call (PUT)
+  elements.saveBtn.addEventListener('click', async () => {
+    const id = elements.productId.value;
+    const specs = {};
+    document.querySelectorAll('#specContainer .spec-key').forEach((keyInput, i) => {
+      const val = document.querySelectorAll('#specContainer .spec-value')[i].value;
+      if (keyInput.value.trim()) {
+        specs[keyInput.value] = val;
+      }
+    });
+
+    const updatedProduct = {
+      id: id,
+      productName: elements.productName.value,
+      description: elements.description.value,
+      price: parseFloat(elements.price.value),
+      stock: parseInt(elements.stock.value),
+      productImageUrl: elements.productImage.src,
+      categoryImageUrl: elements.categoryImage.src,
+      specifications: specs,
+
+      // ✅ include categories
+      selectedCategory: elements.categoryView.value || null,
+      selectedSubCategory: elements.subcategoryView.value || null,
+      suggestedCategory: elements.suggestedCategorySelect?.value || null,
+      suggestedSubCategory: elements.suggestedSubCategorySelect?.value || null
+    };
+
+    try {
+      const res = await fetch(`${apiUrl}/${id}`, {
+        method: "PUT",
+        headers: { 
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`
+        },
+        body: JSON.stringify(updatedProduct),
+      });
+      if (res.ok) {
+        alert("Product updated successfully!");
+        loadProducts();
+        elements.productModal.style.display = "none";
+      } else {
+        alert("Failed to update product.");
+      }
+    } catch (err) {
+      console.error("Error saving product:", err);
+    }
+  });
+
+  // Initial load
+  loadProducts();
+});
+
+
+
+</script>
+
+
+<script>
+const baseApiUrl = "https://ecommercebackend-4zll.onrender.com/api/admin/vendors/product-requests";
+const token = localStorage.getItem("adminToken"); // or wherever you store the JWT
+
+if (!token) {
+    alert("You are not authenticated. Please log in.");
+}
+
+// ✅ Helper to get current product id from hidden field
+function getCurrentRequestId() {
+    return document.getElementById("productId").value;
+}
+
+// Approve
+document.getElementById("approveBtn").addEventListener("click", () => {
+    const requestId = getCurrentRequestId();
+
+    fetch(`${baseApiUrl}/${requestId}/approve`, {
+        method: "PUT",
+        headers: { 
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${token}`
+        },
+        body: JSON.stringify({ status: "APPROVED" }) // ✅ send payload if backend expects it
+    })
+    .then(response => {
+        if (response.ok) return response.text();
+        if (response.status === 401) throw new Error("Unauthorized. Token missing or expired");
+        throw new Error("Failed to approve request");
+    })
+    .then(data => {
+        alert(data);
+        location.reload();
+    })
+    .catch(error => {
+        console.error(error);
+        alert(error.message);
+    });
+});
+
+// Reject
+document.getElementById("rejectBtn").addEventListener("click", () => {
+    const requestId = getCurrentRequestId();
+    const reason = document.getElementById("rejectReason")?.value || prompt("Enter rejection reason:");
+
+    if (!reason || reason.trim() === "") {
+        alert("Rejection reason is required");
+        return;
+    }
+
+    fetch(`${baseApiUrl}/${requestId}/reject`, {
+        method: "PUT",
+        headers: { 
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${token}`
+        },
+        body: JSON.stringify({ reason: reason })
+    })
+    .then(response => {
+        if (response.ok) return response.text();
+        if (response.status === 401) throw new Error("Unauthorized. Token missing or expired");
+        throw new Error("Failed to reject request");
+    })
+    .then(data => {
+        alert(data);
+        location.reload();
+    })
+    .catch(error => {
+        console.error(error);
+        alert(error.message);
+    });
+});
+</script>
+    <script src="js/sidebar.js"></script>
+    <script src="js/topnav.js"></script>
+</body>
+</html>

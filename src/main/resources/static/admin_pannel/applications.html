@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Applications | E-commerce Admin</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"/>
+  <link rel="stylesheet" href="css/style.css"/>
+
+  <style>
+    .error-msg {
+      color: red;
+      font-size: 12px;
+      margin-top: 4px;
+      display: none;
+    }
+    .form-text {
+      color: #6c757d;
+      font-size: 12px;
+      margin-top: 2px;
+    }
+    #applicationsTable button {
+      margin-right: 5px;
+    }
+  </style>
+</head>
+<body>
+  <div id="sidebar-placeholder"></div>
+
+  <div class="main">
+    <div id="top-navbar-placeholder"></div>
+
+    <div class="content">
+      <div class="page-header">
+        <h2>Applications Management</h2>
+        <button class="btn btn-primary" onclick="openAddModal()">
+          <i class="fas fa-plus"></i> Add Application
+        </button>
+      </div>
+
+      <div id="alertContainer"></div>
+
+      <div class="card">
+        <div class="card-header">
+          <h3>All Applications</h3>
+        </div>
+        <div class="table-responsive">
+          <table id="applicationsTable">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Products Count</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============= ADD APPLICATION MODAL ============= -->
+  <div class="modal" id="addApplicationModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>Add New Application</h3>
+        <span class="close" onclick="closeAddModal()">&times;</span>
+      </div>
+      <div class="modal-body">
+        <form id="addApplicationForm">
+          <div class="form-group">
+            <label for="applicationName">Application Name</label>
+            <input type="text" id="applicationName" class="form-control" required>
+            <small class="form-text">Max 50 characters.</small>
+            <div id="applicationNameError" class="error-msg"></div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn" onclick="closeAddModal()">Cancel</button>
+        <button type="button" class="btn btn-primary" onclick="saveApplication()">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============= EDIT APPLICATION MODAL ============= -->
+  <div class="modal" id="editApplicationModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>Edit Application</h3>
+        <span class="close" onclick="closeEditModal()">&times;</span>
+      </div>
+      <div class="modal-body">
+        <form id="editApplicationForm">
+          <input type="hidden" id="editApplicationId">
+          <div class="form-group">
+            <label for="editApplicationName">Application Name</label>
+            <input type="text" id="editApplicationName" class="form-control" required>
+            <div id="editApplicationNameError" class="error-msg"></div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn" onclick="closeEditModal()">Cancel</button>
+        <button type="button" class="btn btn-primary" onclick="updateApplication()">Update</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- View Products Modal -->
+  <div id="viewProductsModal" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="closeViewProductsModal()">&times;</span>
+      <h4>Products List</h4>
+      <table id="viewProductsTable" class="table table-striped">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Price</th>
+            <th>Application</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="js/main.js"></script>
+  <script src="js/sidebar.js"></script>
+  <script src="js/topnav.js"></script>
+
+<script>
+const API_BASE = "https://ecommercebackend-4zll.onrender.com/api/applications";
+const token = localStorage.getItem("adminToken");
+const headers = {
+  "Authorization": `Bearer ${token}`,
+  "Content-Type": "application/json",
+};
+
+if (!token) {
+  alert("Login required");
+  window.location.href = "admin-login.html";
+}
+
+document.addEventListener("DOMContentLoaded", loadApplications);
+
+// Load all applications
+function loadApplications() {
+  fetch(API_BASE, { headers })
+    .then(res => {
+      if (!res.ok) throw new Error("Failed to fetch applications");
+      return res.json();
+    })
+    .then(data => {
+      const tbody = document.querySelector("#applicationsTable tbody");
+      tbody.innerHTML = "";
+      data.forEach(app => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td>${app.id}</td>
+          <td>${app.name}</td>
+          <td>${app.products ? app.products.length : 0}</td>
+          <td>
+            <button class="btn btn-sm btn-info" onclick="viewProducts(${app.id})">
+              <i class="fas fa-eye"></i>
+            </button>
+            <button class="btn btn-sm btn-warning" onclick="openEditModal(${app.id}, '${app.name}')">
+              <i class="fas fa-edit"></i>
+            </button>
+            <button class="btn btn-sm btn-danger" onclick="deleteApplication(${app.id})">
+              <i class="fas fa-trash"></i>
+            </button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    })
+    .catch(err => console.error(err));
+}
+
+// Add Application
+function openAddModal() {
+  document.getElementById("addApplicationForm").reset();
+  document.getElementById("applicationNameError").style.display = "none";
+  document.getElementById("addApplicationModal").style.display = "block";
+}
+function closeAddModal() {
+  document.getElementById("addApplicationModal").style.display = "none";
+}
+function saveApplication() {
+  const name = document.getElementById("applicationName").value.trim();
+  if (!name) {
+    document.getElementById("applicationNameError").textContent = "Name is required.";
+    document.getElementById("applicationNameError").style.display = "block";
+    return;
+  }
+  fetch(API_BASE, {
+    method: "POST",
+    headers,
+    body: JSON.stringify({ name })
+  }).then(res => {
+    if (res.ok) {
+      closeAddModal();
+      loadApplications();
+    } else {
+      alert("Failed to save application.");
+    }
+  });
+}
+
+// Edit Application
+function openEditModal(id, name) {
+  document.getElementById("editApplicationId").value = id;
+  document.getElementById("editApplicationName").value = name;
+  document.getElementById("editApplicationNameError").style.display = "none";
+  document.getElementById("editApplicationModal").style.display = "block";
+}
+function closeEditModal() {
+  document.getElementById("editApplicationModal").style.display = "none";
+}
+function updateApplication() {
+  const id = document.getElementById("editApplicationId").value;
+  const name = document.getElementById("editApplicationName").value.trim();
+  if (!name) {
+    document.getElementById("editApplicationNameError").textContent = "Name is required.";
+    document.getElementById("editApplicationNameError").style.display = "block";
+    return;
+  }
+  fetch(`${API_BASE}/${id}`, {
+    method: "PUT",
+    headers,
+    body: JSON.stringify({ name })
+  }).then(res => {
+    if (res.ok) {
+      closeEditModal();
+      loadApplications();
+    } else {
+      alert("Failed to update application.");
+    }
+  });
+}
+
+// Delete Application
+function deleteApplication(id) {
+  if (!confirm("Are you sure you want to delete this application?")) return;
+  fetch(`${API_BASE}/${id}`, { method: "DELETE", headers })
+    .then(res => {
+      if (res.ok) {
+        loadApplications();
+      } else {
+        alert("Failed to delete application.");
+      }
+    });
+}
+
+// View Products
+function viewProducts(applicationId) {
+  const modal = document.getElementById("viewProductsModal");
+  const tbody = document.querySelector("#viewProductsTable tbody"); // ✅ FIXED
+  tbody.innerHTML = "<tr><td colspan='4'>Loading...</td></tr>";
+
+  fetch(`${API_BASE}/${applicationId}`) // make sure `apiBase` is same as your other code
+    .then(res => res.json())
+    .then(app => {
+      tbody.innerHTML = "";
+      if (app.products && app.products.length > 0) {
+        app.products.forEach(product => {
+          const tr = document.createElement("tr");
+          tr.innerHTML = `
+            <td>${product.id}</td>
+            <td>${product.name || "Unnamed Product"}</td>
+            <td>${product.price ? product.price : "-"}</td>
+            <td>${app.name || "N/A"}</td>
+          `;
+          tbody.appendChild(tr);
+        });
+      } else {
+        tbody.innerHTML = "<tr><td colspan='4'>No products found.</td></tr>";
+      }
+      modal.style.display = "block";
+    })
+    .catch(err => {
+      tbody.innerHTML = "<tr><td colspan='4'>Error loading products.</td></tr>";
+      console.error("Error fetching products:", err);
+    });
+}
+
+</script>
+</body>
+</html>

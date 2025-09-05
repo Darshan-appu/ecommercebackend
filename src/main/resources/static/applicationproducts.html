@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>AEROMATX - Products by Application</title>
+
+  <!-- Styles -->
+  <link href="https://fonts.googleapis.com/css?family=Montserrat:400,500,700" rel="stylesheet" />
+  <link rel="stylesheet" href="css/bootstrap.min.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/assets/owl.carousel.min.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/assets/owl.theme.default.min.css" />
+  <link rel="stylesheet" href="css/font-awesome.min.css" />
+  <link rel="stylesheet" href="css/index.css" />
+  <link rel="stylesheet" href="css/satcom.css" />
+  <style>
+    /* Custom styles for application buttons and product cards */
+    .no-datasheet {
+      opacity: 0.6;
+      pointer-events: none;
+    }
+    .category-quick-buttons {
+      display: flex;
+      justify-content: center;
+      gap: 14px;
+      background: #f8fafc; /* light background strip */
+      padding: 14px 20px;
+      border-top: 1px solid #e5e7eb;
+      margin-bottom: 20px; /* Added spacing */
+    }
+    .category-quick-buttons button {
+      background: transparent;
+      color: #0f172a;
+      border: 1.8px solid #d1d5db;
+      padding: 9px 22px;
+      border-radius: 9999px; /* full pill */
+      font-weight: 700;
+      font-size: 13px;
+      letter-spacing: 0.5px;
+      cursor: pointer;
+      text-transform: uppercase;
+      transition: all 0.25s ease-in-out, box-shadow 0.25s ease-in-out;
+      position: relative;
+      overflow: hidden;
+    }
+    .category-quick-buttons button:hover {
+      border-color: #1989AC;
+      color: #1989AC;
+      background: rgba(25, 137, 172, 0.08);
+      box-shadow: 0 4px 12px rgba(25, 137, 172, 0.25);
+      transform: translateY(-2px);
+    }
+    .category-quick-buttons button.active {
+      background: #1989AC;
+      color: white;
+      border-color: #1989AC;
+      box-shadow: 0 4px 14px rgba(25, 137, 172, 0.35);
+    }
+    .category-quick-buttons button::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: rgba(25, 137, 172, 0.12);
+      transition: left 0.3s ease;
+      z-index: 0;
+    }
+    .category-quick-buttons button:hover::before {
+      left: 0;
+    }
+    .category-quick-buttons button span {
+      position: relative;
+      z-index: 1;
+    }
+    .product-application-group {
+      margin-bottom: 40px;
+    }
+    .product-application-group h4 {
+      margin-bottom: 20px;
+      padding-bottom: 10px;
+      border-bottom: 2px solid #eee;
+    }
+    .product-subcategory-title {
+        margin-top: 20px;
+        margin-bottom: 10px;
+        color: #555;
+        font-size: 1.1em;
+        font-weight: 600;
+    }
+  </style>
+</head>
+<body>
+  <div id="header-placeholder"></div>
+
+  <!-- Dynamic Application Buttons Container -->
+  <div id="application-buttons-container" class="category-quick-buttons">
+    <!-- Buttons will be generated here by JavaScript -->
+  </div>
+
+  <div class="section">
+    <div class="container">
+      <div class="row">
+        <div class="col-md-12">
+          <div class="section-title">
+            <h3 class="title">Products by Application</h3>
+          </div>
+        </div>
+        <!-- This is where the grouped and sorted products will be displayed -->
+        <div class="col-md-12" id="application-product-groups"></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="footer-placeholder"></div>
+
+  <!-- Scripts -->
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+  <script src="js/bootstrap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/owl.carousel.min.js"></script>
+  <script src="js/jquery.zoom.min.js"></script>
+  <script src="js/navigation.js"></script>
+  <script src="js/frontend-header.js"></script>
+  <script src="js/profileBehviour.js"></script>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const urlParams = new URLSearchParams(window.location.search);
+      const categoryId = urlParams.get("categoryId");
+      // Optionally, you might want to handle a default category if categoryId is not present
+      if (!categoryId) {
+          console.warn("No categoryId found in URL. Displaying all products (if available) or a default set.");
+          // You might want to fetch all products or redirect to a default category page
+          // For now, it will simply return if no categoryId is present
+          // return; 
+      }
+
+      let allProducts = []; // Stores the full product list for filtering and sorting
+      let applicationSortOrder = []; // Populated from the API applications, sorted alphabetically
+      const appButtonsContainer = document.getElementById("application-buttons-container");
+      const productDisplayContainer = document.getElementById("application-product-groups");
+
+      // Function to render products grouped by application and then by subcategory
+      const renderProducts = (productsToDisplay) => {
+        productDisplayContainer.innerHTML = ''; // Clear existing products
+
+        // Sort products by the defined application order (alphabetical in this case)
+        productsToDisplay.sort((a, b) => {
+            const aApp = a.applicationName?.toUpperCase() || '';
+            const bApp = b.applicationName?.toUpperCase() || '';
+            const aIndex = applicationSortOrder.indexOf(aApp);
+            const bIndex = applicationSortOrder.indexOf(bApp);
+
+            // Products with no application name will be pushed to the end
+            const resolvedAIndex = aIndex === -1 ? Infinity : aIndex;
+            const resolvedBIndex = bIndex === -1 ? Infinity : bIndex;
+
+            if (resolvedAIndex !== resolvedBIndex) {
+                return resolvedAIndex - resolvedBIndex;
+            }
+            // If applications are the same or both not found, sort by subCategoryName then product name
+            const aSubCat = a.subCategoryName || '';
+            const bSubCat = b.subCategoryName || '';
+            if (aSubCat.localeCompare(bSubCat) !== 0) {
+                return aSubCat.localeCompare(bSubCat);
+            }
+            return (a.name || '').localeCompare(b.name || '');
+        });
+
+        const groupedByApplication = {};
+        productsToDisplay.forEach(p => {
+            const appName = p.applicationName || 'Others'; // Group products without an app under 'Others'
+            if (!groupedByApplication[appName]) {
+                groupedByApplication[appName] = [];
+            }
+            groupedByApplication[appName].push(p);
+        });
+
+        // Loop through the sorted application names (from applicationSortOrder) to render sections
+        applicationSortOrder.forEach(appNameUpper => {
+            const appName = appNameUpper.charAt(0).toUpperCase() + appNameUpper.slice(1).toLowerCase(); // For display formatting
+            const productsInApp = groupedByApplication[appName] || [];
+            
+            if (productsInApp.length > 0) {
+                const appSection = document.createElement("div");
+                appSection.className = "product-application-group";
+                appSection.innerHTML = `<h4>${appName}</h4><div class="row" id="app-${appNameUpper.replace(/\s/g, '-')}-products"></div>`;
+                productDisplayContainer.appendChild(appSection);
+
+                const currentRow = appSection.querySelector(".row");
+                let lastSubCategory = ''; // To track subcategory for titles within an application group
+
+                productsInApp.forEach(p => {
+                    // Add subcategory title if it's a new subcategory within this application group
+                    if (p.subCategoryName && p.subCategoryName !== lastSubCategory) {
+                        const subCatTitle = document.createElement('div');
+                        subCatTitle.className = 'col-md-12';
+                        subCatTitle.innerHTML = `<h5 class="product-subcategory-title">${p.subCategoryName}</h5>`;
+                        currentRow.appendChild(subCatTitle);
+                        lastSubCategory = p.subCategoryName;
+                    } else if (!p.subCategoryName && lastSubCategory !== 'Others') { // For products without subcategory
+                        const subCatTitle = document.createElement('div');
+                        subCatTitle.className = 'col-md-12';
+                        subCatTitle.innerHTML = `<h5 class="product-subcategory-title">Others</h5>`;
+                        currentRow.appendChild(subCatTitle);
+                        lastSubCategory = 'Others';
+                    }
+
+                    const hasSheet = !!p.datasheetUrl;
+                    const productHtml = `
+                        <div class="col-md-3">
+                            <div class="product modern-product-card">
+                                <div class="product-top-link">
+                                    <div class="product-img">
+                                        <img src="${p.imageUrl || './img/placeholder.png'}" alt="${p.name}" />
+                                    </div>
+                                    <div class="product-body">
+                                        <p class="product-category">${p.subCategoryName || 'N/A'}</p>
+                                        <h3 class="product-name">${p.name}</h3>
+                                        <h4 class="product-price">₹${p.price?.toFixed(2) || '0.00'}</h4>
+                                    </div>
+                                </div>
+                                <div class="product-action d-flex flex-column gap-1">
+                                    ${hasSheet
+                                        ? `<a href="${p.datasheetUrl}" target="_blank" class="btn btn-sm btn-outline-primary">
+                                            <i class="fa fa-file-pdf-o"></i> Download Datasheet
+                                        </a>`
+                                        : `<button class="btn btn-sm btn-secondary" disabled>
+                                            <i class="fa fa-file-pdf-o"></i> No Datasheet
+                                        </button>`
+                                    }
+                                    <button class="btn btn-sm btn-success customize-product" data-product='${JSON.stringify(p)}' data-toggle="modal" data-target="#customizeModal">
+                                        <i class="fa fa-cog mr-1"></i> Customize
+                                    </button>
+                                </div>
+                            </div>
+                        </div>`;
+                    currentRow.innerHTML += productHtml;
+                });
+            }
+        });
+        // Handle products without an assigned application at the very end (if not already handled)
+        const otherProducts = groupedByApplication['Others'] || [];
+        if (otherProducts.length > 0 && !applicationSortOrder.includes('OTHERS')) { // Only render if 'Others' isn't explicitly in sort order
+            const othersSection = document.createElement("div");
+            othersSection.className = "product-application-group";
+            othersSection.innerHTML = `<h4>Others (No Application Assigned)</h4><div class="row" id="app-others-products"></div>`;
+            productDisplayContainer.appendChild(othersSection);
+
+            const currentRow = othersSection.querySelector(".row");
+            let lastSubCategory = '';
+            otherProducts.forEach(p => {
+                 if (p.subCategoryName && p.subCategoryName !== lastSubCategory) {
+                        const subCatTitle = document.createElement('div');
+                        subCatTitle.className = 'col-md-12';
+                        subCatTitle.innerHTML = `<h5 class="product-subcategory-title">${p.subCategoryName}</h5>`;
+                        currentRow.appendChild(subCatTitle);
+                        lastSubCategory = p.subCategoryName;
+                }
+
+                const hasSheet = !!p.datasheetUrl;
+                const productHtml = `
+                    <div class="col-md-3">
+                        <div class="product modern-product-card">
+                            <div class="product-top-link">
+                                <div class="product-img">
+                                    <img src="${p.imageUrl || './img/placeholder.png'}" alt="${p.name}" />
+                                </div>
+                                <div class="product-body">
+                                    <p class="product-category">${p.subCategoryName || 'N/A'}</p>
+                                    <h3 class="product-name">${p.name}</h3>
+                                    <h4 class="product-price">₹${p.price?.toFixed(2) || '0.00'}</h4>
+                                </div>
+                            </div>
+                            <div class="product-action d-flex flex-column gap-1">
+                                ${hasSheet
+                                    ? `<a href="${p.datasheetUrl}" target="_blank" class="btn btn-sm btn-outline-primary">
+                                        <i class="fa fa-file-pdf-o"></i> Download Datasheet
+                                    </a>`
+                                    : `<button class="btn btn-sm btn-secondary" disabled>
+                                        <i class="fa fa-file-pdf-o"></i> No Datasheet
+                                    </button>`
+                                }
+                                <button class="btn btn-sm btn-success customize-product" data-product='${JSON.stringify(p)}' data-toggle="modal" data-target="#customizeModal">
+                                    <i class="fa fa-cog mr-1"></i> Customize
+                                </button>
+                            </div>
+                        </div>
+                    </div>`;
+                currentRow.innerHTML += productHtml;
+            });
+        }
+      };
+
+      // Function to filter and display products based on the selected application
+      const filterAndDisplayProducts = (selectedApp) => {
+        let filteredProducts;
+        if (selectedApp === 'ALL') {
+          filteredProducts = allProducts;
+        } else {
+          filteredProducts = allProducts.filter(p => p.applicationName && p.applicationName.toUpperCase() === selectedApp.toUpperCase());
+        }
+        renderProducts(filteredProducts);
+      };
+
+      // Fetch and create application buttons
+      fetch("https://ecommercebackend-4zll.onrender.com/api/applications")
+        .then(res => res.json())
+        .then(applications => {
+          // Sort applications alphabetically by name to define the order
+          applications.sort((a, b) => a.name.localeCompare(b.name));
+          
+          // Populate the sorting array with the names from the API for consistent order
+          applicationSortOrder = applications.map(app => app.name.toUpperCase());
+          
+          // Create "ALL" button
+          const allButton = document.createElement("button");
+          allButton.textContent = "ALL";
+          allButton.className = "active";
+          allButton.dataset.application = "ALL";
+          appButtonsContainer.appendChild(allButton);
+
+          // Create buttons for each application from the API
+          applications.forEach(app => {
+            const button = document.createElement("button");
+            button.textContent = app.name.toUpperCase();
+            button.dataset.application = app.name;
+            appButtonsContainer.appendChild(button);
+          });
+
+          // Add click event listener to the container
+          appButtonsContainer.addEventListener("click", event => {
+            if (event.target.tagName === "BUTTON") {
+              const selectedApp = event.target.dataset.application;
+              document.querySelectorAll("#application-buttons-container button").forEach(btn => btn.classList.remove("active"));
+              event.target.classList.add("active");
+              filterAndDisplayProducts(selectedApp);
+            }
+          });
+        })
+        .catch(err => console.error("❌ Error fetching applications:", err));
+
+      // Fetch all products for the category and initialize the display
+      // Assumes a categoryId is still relevant for this page
+      const productFetchUrl = categoryId 
+        ? `http://localhost:8080/api/products/by-category/${categoryId}` 
+        : `http://localhost:8080/api/products/all`; // Fallback if no categoryId
+
+      fetch(productFetchUrl)
+        .then(res => res.json())
+        .then(products => {
+          allProducts = products; // Store the full list
+          filterAndDisplayProducts('ALL'); // Initial rendering with all products
+        })
+        .catch(err => console.error("❌ Error loading products:", err));
+
+      $("#header-placeholder").load("header.html", () => {
+        try {
+          FrontendHeader?.init?.();
+        } catch (e) {
+          console.warn("⚠️ FrontendHeader is not defined");
+        }
+      });
+      $("#footer-placeholder").load("footer.html");
+    });
+
+    // --- Modal Logic (Copied from store.html) ---
+    let selectedProduct = null;
+    $('#customizeModal').on('show.bs.modal', e => {
+      selectedProduct = JSON.parse($(e.relatedTarget).attr('data-product'));
+      $('#c-prod-name').text(selectedProduct.name);
+      $('#c-qty').val(1);
+      $('#c-notes').val('');
+      const container = $('#c-specs-container');
+      container.empty();
+
+      const groupedSpecs = {};
+      selectedProduct.specifications?.forEach(spec => {
+        if (!groupedSpecs[spec.key]) groupedSpecs[spec.key] = new Set();
+        groupedSpecs[spec.key].add(spec.value);
+      });
+
+      Object.entries(groupedSpecs).forEach(([key, values]) => {
+        const select = $(`
+          <div class="form-group">
+            <label>${key}</label>
+            <select class="form-control spec-selector" data-key="${key}">
+              ${Array.from(values).map(val => `<option value="${val}">${val}</option>`).join('')}
+            </select>
+          </div>
+        `);
+        container.append(select);
+      });
+    });
+
+    $('#c-add-btn').click(function () {
+      const qty = Math.max(1, parseInt($('#c-qty').val()));
+      const notes = $('#c-notes').val().trim();
+
+      const specs = [];
+      $('.spec-selector').each(function () {
+        const key = $(this).data('key');
+        const value = $(this).val();
+        specs.push({ key, value });
+      });
+
+      const payload = {
+        productId: selectedProduct.id,
+        quantity: qty,
+        notes,
+        specifications: specs
+      };
+
+      fetch('http://localhost:8080/api/cart', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + localStorage.getItem('userToken')
+        },
+        body: JSON.stringify(payload)
+      })
+        .then(async res => {
+          const contentType = res.headers.get('content-type');
+          if (contentType && contentType.includes('application/json')) {
+            const data = await res.json();
+            console.log('✅ Added to cart (JSON):', data);
+          } else {
+            const text = await res.text();
+            console.log('✅ Added to cart (Text):', text);
+          }
+          $('#customizeModal').modal('hide');
+          $('body').removeClass('modal-open');
+          $('.modal-backdrop').remove();
+          alert("✅ Item successfully added to cart!");
+        })
+        .catch(err => {
+          console.error('❌ Error adding to cart:', err);
+          alert("⚠️ Please login to add items to your cart.");
+        });
+    });
+  </script>
+
+  <!-- Customize Modal (Copied from store.html) -->
+  <div class="modal fade" id="customizeModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-md" role="document">
+      <div class="modal-content p-3">
+        <div class="modal-header">
+          <h5 class="modal-title">Customize Product</h5>
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+        </div>
+        <div class="modal-body">
+          <p><strong id="c-prod-name"></strong></p>
+          <div id="c-specs-container"></div>
+          <div class="form-group">
+            <label>Quantity</label>
+            <input id="c-qty" type="number" class="form-control" value="1" min="1" />
+          </div>
+          <div class="form-group">
+            <label>Notes</label>
+            <textarea id="c-notes" class="form-control" placeholder="Optional notes..."></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-primary" id="c-add-btn">Add to Cart</button>
+          <button class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

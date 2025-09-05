@@ -1,25 +1,22 @@
 (function($) {
     "use strict";
-    // ---------------------------------------------------------------------------
+
     // Dropdown on mouse hover
-    function toggleNavbarHover() {
-        if ($(window).width() > 992) {
-            $('.navbar .dropdown').on('mouseover', function() {
-                $('.dropdown-toggle', this).trigger('click');
-            }).on('mouseout', function() {
-                $('.dropdown-toggle', this).trigger('click').blur();
-            });
-        } else {
-            $('.navbar .dropdown').off('mouseover').off('mouseout');
-        }
-    }
-
     $(document).ready(function() {
-        toggleNavbarHover();
-        $(window).resize(toggleNavbarHover);
+        function toggleNavbarMethod() {
+            if ($(window).width() > 992) {
+                $('.navbar .dropdown').on('mouseover', function() {
+                    $('.dropdown-toggle', this).trigger('click');
+                }).on('mouseout', function() {
+                    $('.dropdown-toggle', this).trigger('click').blur();
+                });
+            } else {
+                $('.navbar .dropdown').off('mouseover').off('mouseout');
+            }
+        }
+        toggleNavbarMethod();
+        $(window).resize(toggleNavbarMethod);
     });
-
-    // ---------------------------------------------------------------------------
 
 
     // Back to top button
@@ -1613,7 +1610,7 @@ document.addEventListener("DOMContentLoaded", function() {
             };
 
             // !!! IMPORTANT: Replace with your actual login API endpoint !!!
-            const API_ENDPOINT = "https://ecommercebackend-i16e.onrender.com/api/login"; // Example URL
+            const API_ENDPOINT = "http://localhost:8080/api/login"; // Example URL
 
             try {
                 // Make the API call using fetch

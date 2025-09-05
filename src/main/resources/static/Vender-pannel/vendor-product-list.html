@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vendor Panel - Product List</title>
+  <link rel="stylesheet" href="vendor-sidebar.css">
+
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, sans-serif;
+      background: #f8f9fa;
+      margin: 0;
+      padding: 0;
+    }
+
+    .main-content {
+      margin-left: 240px;
+      padding: 20px;
+    }
+
+    h1 {
+      font-size: 28px;
+      font-weight: bold;
+      color: #333;
+    }
+
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      background: white;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    th, td {
+      padding: 12px 15px;
+      text-align: left;
+    }
+
+    thead {
+      background: #007BFF;
+      color: white;
+    }
+
+    tr:nth-child(even) {
+      background: #f2f2f2;
+    }
+
+    img {
+      border-radius: 6px;
+      max-width: 60px;
+    }
+
+    .status-badge {
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-weight: bold;
+      font-size: 0.85rem;
+      display: inline-block;
+    }
+
+    .status-pending {
+      background: #fff3cd;
+      color: #856404;
+    }
+
+    .status-approved {
+      background: #d4edda;
+      color: #155724;
+    }
+
+    .status-rejected {
+      background: #f8d7da;
+      color: #721c24;
+    }
+
+    .product-actions {
+      margin-top: 8px;
+    }
+
+    .btn {
+      padding: 6px 12px;
+      border-radius: 6px;
+      border: none;
+      cursor: pointer;
+      font-size: 0.85rem;
+      margin-right: 6px;
+    }
+
+    .btn-edit {
+      background: #ffc107;
+      color: #212529;
+    }
+
+    .btn-delete {
+      background: #dc3545;
+      color: white;
+    }
+
+    .reject-reason {
+      font-size: 0.85rem;
+      color: #721c24;
+      margin-top: 4px;
+      font-style: italic;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <h2>Vendor Panel</h2>
+    <a href="vendor-dashboard.html">Dashboard</a>
+    <a href="vendor-add-product.html">Add Product</a>
+    <a href="vendor-product-list.html" class="active">📦 Product List</a>
+    <a href="vendor-edit-profile.html">Edit Profile</a>
+    <a href="vendor-view-profile.html">View Profile</a>
+    <a href="vendor-login.html">Logout</a>
+  </div>
+
+  <!-- Main Content -->
+  <div class="main-content">
+    <h1>Your Products</h1>
+    <p>Here is the list of all products you have added.</p>
+
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Product</th>
+          <th>Price</th>
+          <th>Description</th>
+          <th>Image</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody id="productTableBody">
+        <!-- Products will be loaded here -->
+      </tbody>
+    </table>
+  </div>
+
+  <script>
+    const productTableBody = document.getElementById('productTableBody');
+    const token = localStorage.getItem("vendorToken"); // JWT saved at login
+    const baseApiUrl = "http://localhost:8080/api/vendor";
+
+    if (!token) {
+      alert("You are not logged in. Please login again.");
+      window.location.href = "vendor-login.html";
+    }
+
+    // Fetch vendor's product requests
+    async function loadProducts() {
+      try {
+        const res = await fetch(`${baseApiUrl}/my-product-requests`, {
+          headers: {
+            "Authorization": `Bearer ${token}`
+          }
+        });
+
+        if (!res.ok) {
+          throw new Error("Failed to fetch products");
+        }
+
+        const products = await res.json();
+        renderProducts(products);
+      } catch (error) {
+        console.error("Error fetching products:", error);
+        productTableBody.innerHTML = `<tr><td colspan="6">Failed to load products</td></tr>`;
+      }
+    }
+
+    function renderProducts(products) {
+      productTableBody.innerHTML = "";
+      if (products.length === 0) {
+        productTableBody.innerHTML = `<tr><td colspan="6">No products found</td></tr>`;
+        return;
+      }
+
+      products.forEach(product => {
+        let statusClass = '';
+        if (product.status === "PENDING") statusClass = 'status-pending';
+        else if (product.status === "APPROVED") statusClass = 'status-approved';
+        else if (product.status === "REJECTED") statusClass = 'status-rejected';
+
+        let actionHTML = '';
+
+        if (product.status === "PENDING") {
+          actionHTML = `
+            <div class="product-actions">
+              <button class="btn btn-edit" onclick="editProduct(${product.id})">✏️ Edit</button>
+              <button class="btn btn-delete" onclick="deleteProduct(${product.id})">🗑 Delete</button>
+            </div>
+          `;
+        }
+
+        if (product.status === "REJECTED" && product.rejectionReason) {
+          actionHTML += `<div class="reject-reason">Reason: ${product.rejectionReason}</div>`;
+        }
+
+        const row = `
+          <tr>
+            <td>${product.id}</td>
+            <td>${product.productName}</td>
+            <td>₹${product.price}</td>
+            <td>${product.description}</td>
+            <td><img src="${product.productImageUrl}" alt="${product.productName}"></td>
+            <td>
+              <span class="status-badge ${statusClass}">${product.status}</span>
+              ${actionHTML}
+            </td>
+          </tr>
+        `;
+
+        productTableBody.innerHTML += row;
+      });
+    }
+
+    function editProduct(id) {
+      window.location.href = `vendor-add-product.html?edit=${id}`;
+    }
+
+    async function deleteProduct(id) {
+      if (!confirm("Are you sure you want to delete this product?")) return;
+
+      try {
+        const res = await fetch(`${baseApiUrl}/product-request/${id}/delete`, {
+          method: "DELETE",
+          headers: {
+            "Authorization": `Bearer ${token}`
+          }
+        });
+
+        if (!res.ok) {
+          const msg = await res.text();
+          throw new Error(msg);
+        }
+
+        alert("Product deleted successfully!");
+        loadProducts();
+      } catch (error) {
+        alert("Failed to delete: " + error.message);
+      }
+    }
+
+    // Load products on page load
+    loadProducts();
+  </script>
+
+</body>
+</html>

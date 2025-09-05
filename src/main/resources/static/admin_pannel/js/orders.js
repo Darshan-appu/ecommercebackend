@@ -1,6 +1,6 @@
 // js/orders.js
 
-const BASE_URL = 'https://ecommercebackend-i16e.onrender.com'; // Your backend base URL
+const BASE_URL = 'http://localhost:8080'; // Your backend base URL
 const ordersTableBody = document.querySelector('#ordersTable tbody');
 const statusFilter = document.getElementById('statusFilter');
 const alertContainer = document.getElementById('alertContainer');

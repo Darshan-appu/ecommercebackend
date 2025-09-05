@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AeroMatx Loader</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      background: linear-gradient(135deg, #ececec, #92b1e6);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .loader-wrapper {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 150px;
+      width: auto;
+      margin: 2rem;
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      font-size: 4rem;
+      font-weight: 700;
+      user-select: none;
+      color: #fff;
+    }
+
+    /* Logo Style */
+    .logo-part {
+      display: inline-block;
+      opacity: 0;
+      animation: logo-fade 3s infinite;
+    }
+
+    .minimal-aero {
+      color: #1898CA;
+      font-weight: 700;
+      letter-spacing: 2px;
+      animation-delay: 0.1s;
+    }
+
+    .minimal-mat {
+      color: #888;
+      font-weight: 600;
+      letter-spacing: 2px;
+      animation-delay: 0.3s;
+    }
+
+    .minimal-x {
+      color: #1898CA;
+      font-weight: 900;
+      font-size: 40px;
+      margin-left: 8px;
+      border: 2px solid #1898CA;
+      width: 60px;
+      height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      background: transparent;
+      animation-delay: 0.5s;
+    }
+
+    @keyframes logo-fade {
+      0% { opacity: 0; transform: scale(0.8); }
+      20% { opacity: 1; transform: scale(1.1); text-shadow: 0 0 12px rgba(24,152,202,0.6); }
+      50% { opacity: 0.8; transform: scale(1); }
+      100% { opacity: 0; transform: scale(0.9); }
+    }
+
+    @keyframes pulse-bg {
+      0% { transform: scale(0.9); opacity: 0.2; }
+      50% { transform: scale(1.1); opacity: 0.8; }
+      100% { transform: scale(0.95); opacity: 0.4; }
+    }
+  </style>
+</head>
+<body>
+  <div class="loader-wrapper">
+    <div class="loader-bg"></div>
+    <span class="logo-part minimal-aero">AERO</span>
+    <span class="logo-part minimal-mat">MAT</span>
+    <span class="logo-part minimal-x">X</span>
+  </div>
+
+  <!-- Auto redirect after 3s -->
+  <script>
+    setTimeout(function() {
+      window.location.href = "location.html"; // target page
+    }, 2000);
+  </script>
+</body>
+</html>

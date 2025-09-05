@@ -16,6 +16,203 @@
   <link rel="stylesheet" href="css/satcom.css">
   <style>
     .no-datasheet { opacity: .6; pointer-events: none; }
+            .no-datasheet { opacity: .6; pointer-events: none; }
+        
+        .hanging-note {
+            position: absolute;
+            bottom: 40px;
+            right: 60px;
+            animation: swing 3s ease-in-out infinite;
+            transform-origin: top center;
+        }
+
+        .note-card {
+            position: relative;
+            width: 260px;
+            background: #fff;
+            border-radius: 15px;
+            box-shadow: 0px 8px 18px rgba(0,0,0,0.12);
+            padding: 20px;
+        }
+
+        /* Red Pin */
+        .note-card::before {
+            content: '';
+            position: absolute;
+            top: -12px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 22px;
+            height: 22px;
+            background: red;
+            border-radius: 50%;
+            box-shadow: inset -3px -3px 5px rgba(0,0,0,0.3);
+            z-index: 2;
+        }
+
+        /* Inner content */
+        .note-list {
+            background: #ffecec;
+            padding: 15px;
+            border-radius: 10px;
+        }
+
+        .note-list p {
+            margin: 10px 0;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #333;
+        }
+
+        .note-list span {
+            color: #d24b4b;
+            font-weight: bold;
+            font-size: 15px;
+        }
+
+        /* Wobble Animation */
+        @keyframes swing {
+            0%   { transform: rotate(20deg); }
+            50%  { transform: rotate(-20deg); }
+            100% { transform: rotate(20deg); }
+        }
+
+        /* ---- Existing Section ---- */
+        .why-choose {
+            padding: 100px 0;
+            background: linear-gradient(180deg, #f9fbfd 0%, #eef2f6 100%);
+            position: relative;
+        }
+
+        .why-container {
+            display: grid;
+            grid-template-columns: 1.1fr 1fr;
+            align-items: center;
+            gap: 80px;
+            max-width: 1250px;
+            margin: auto;
+            padding: 0 40px;
+        }
+
+        .why-image img {
+            width: 100%;
+            border-radius: 20px;
+            object-fit: cover;
+            box-shadow: 0 18px 40px rgba(0, 0, 0, 0.12);
+            transition: transform 0.4s ease, box-shadow 0.4s ease;
+        }
+        
+        .why-image img:hover {
+            transform: scale(1.05);
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.2);
+        }
+
+        .why-content {
+            color: #2c3e50;
+            animation: fadeUp 1.2s ease forwards;
+            opacity: 0;
+        }
+
+        .why-content h2 {
+            font-size: 2.8rem;
+            font-weight: 800;
+            color: #1c1c1c;
+            margin-bottom: 20px;
+            line-height: 1.3;
+        }
+        
+        .why-content h2 span {
+            color: #0078d7;
+            border-bottom: 4px solid #0078d7;
+            padding-bottom: 5px;
+        }
+
+        .why-content .sub-heading {
+            font-size: 1.2rem;
+            color: #555;
+            margin-bottom: 35px;
+            line-height: 1.7;
+            max-width: 500px;
+        }
+
+        .benefits {
+            display: grid;
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+        
+        .benefit {
+            display: flex;
+            align-items: flex-start;
+            gap: 15px;
+            background: #fff;
+            padding: 18px 22px;
+            border-radius: 14px;
+            box-shadow: 0 6px 14px rgba(0, 0, 0, 0.06);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .benefit:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 10px 22px rgba(0, 0, 0, 0.1);
+        }
+        
+        .benefit .icon {
+            color: #0078d7;
+            font-size: 1.4rem;
+            font-weight: bold;
+        }
+        
+        .benefit p {
+            margin: 0;
+            font-size: 1.05rem;
+            line-height: 1.6;
+            color: #333;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #0078d7, #005ea1);
+            color: #fff;
+            padding: 16px 42px;
+            text-decoration: none;
+            border-radius: 50px;
+            font-weight: 700;
+            font-size: 1.3rem;
+            transition: all 0.3s ease;
+            display: inline-block;
+        }
+        
+        .btn-primary:hover {
+            box-shadow: 0 10px 26px rgba(0, 120, 215, 0.35);
+            transform: translateY(-4px);
+        }
+
+        /* Animation */
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(40px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Responsive: move note inside on mobile */
+        @media (max-width: 900px) {
+            .why-container {
+                grid-template-columns: 1fr;
+                text-align: center;
+                gap: 50px;
+            }
+            
+            .why-content {
+                opacity: 1;
+            }
+            
+            .hanging-note {
+                position: static;
+                margin: 40px auto 0;
+                animation: none;
+            }
+        }
   </style>
 </head>
 
@@ -26,8 +223,11 @@
   <div class="section">
     <div class="container">
       <div class="row">
-      <!--  <div class="col-md-12"><div class="section-title"><h3 class="title">Shop by Categories</h3></div></div>-->
-        <div class="col-md-12">
+        <div class="col-md-12"> <div class="section-title" style="text-align:center;">
+            <h3 class="title">Area Of Distribution </h3>
+          </div>
+        </div>       
+         <div class="col-md-12">
           <div id="category-container" class="products-slick" data-nav="#slick-nav-cat"></div>
           <div id="slick-nav-cat" class="products-slick-nav"></div>
         </div>
@@ -60,6 +260,48 @@
       </div>
     </div>
   </div>
+ <section class="why-choose">
+        <div class="why-container">
+            <!-- Left Image -->
+            <div class="why-image">
+                <img src="img/new1.jpg" alt="Advanced Materials">
+            </div>
+
+            <!-- Right Content -->
+            <div class="why-content">
+                <h2>
+                    Why Partner With <span>AEROMATX</span>
+                </h2>
+                <p class="sub-heading">
+                    Your trusted partner in delivering excellence in advanced materials and technology solutions.
+                </p>
+
+                <!-- Benefits -->
+                <div class="benefits">
+                    <div class="benefit">
+                        <i class="icon">✔</i>
+                        <p><strong>Superior Quality Materials</strong> – Built to meet global standards with reliability you can trust.</p>
+                    </div>
+                    <div class="benefit">
+                        <i class="icon">✔</i>
+                        <p><strong>Customer-Centric Approach</strong> – Tailored solutions to fit your project needs.</p>
+                    </div>
+                    <div class="benefit">
+                        <i class="icon">✔</i>
+                        <p><strong>On-Time Delivery</strong> – Commitment to efficiency and deadlines, every time.</p>
+                    </div>
+                    <div class="benefit">
+                        <i class="icon">✔</i>
+                        <p><strong>Scalable Expertise</strong> – From small prototypes to large-scale orders.</p>
+                    </div>
+                </div>
+
+                <a href="#contact" class="btn-primary">Let's Work Together</a>
+            </div>
+        </div>
+
+        <!-- Hanging Note at the End -->
+    </section>
 
   <div id="footer-placeholder"></div>
 
@@ -74,8 +316,9 @@
 
 
   <script>
+    
     document.addEventListener("DOMContentLoaded", () => {
-      fetch("https://ecommercebackend-i16e.onrender.com/api/products/all")
+      fetch("https://ecommercebackend-4zll.onrender.com/api/products/all")
         .then(r => r.json())
         .then(products => {
           const newCont = document.getElementById("product-container");
@@ -110,7 +353,7 @@
         })
         .catch(err => console.error("Product load error", err));
 
-      fetch("https://ecommercebackend-i16e.onrender.com/api/categories")
+      fetch("https://ecommercebackend-4zll.onrender.com/api/categories")
         .then(r => r.json())
         .then(cats => {
           const catCont = document.getElementById("category-container");
@@ -215,7 +458,7 @@
         specifications: specs
       };
 
-      fetch('https://ecommercebackend-i16e.onrender.com/api/cart', {
+      fetch('https://ecommercebackend-4zll.onrender.com/api/cart', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -235,6 +478,13 @@
         alert("❌ Failed to add item to cart.");
       });
     });
+            // Simple script to trigger the fade-in animation when the page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            const whyContent = document.querySelector('.why-content');
+            whyContent.style.opacity = '1';
+            whyContent.style.transform = 'translateY(0)';
+        });
+        
   </script>
 </body>
 </html>

@@ -1,6 +1,6 @@
 // API Configuration
 const API_CONFIG = {
-    BASE_URL: 'https://ecommercebackend-i16e.onrender.com/api',
+    BASE_URL: 'http://localhost:8080/api',
     TIMEOUT: 10000
 };
 
@@ -13,7 +13,7 @@ class APIService {
     async makeRequest(endpoint, options = {}) {
         const url = `${this.baseURL}${endpoint}`;
         const token = localStorage.getItem('authToken');
-
+        
         const defaultOptions = {
             headers: {
                 'Content-Type': 'application/json',
@@ -32,11 +32,11 @@ class APIService {
 
         try {
             const response = await fetch(url, finalOptions);
-
+            
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
-
+            
             return await response.json();
         } catch (error) {
             console.error('API request failed:', error);

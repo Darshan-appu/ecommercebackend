@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vendor Login</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f6f8;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+    }
+    .login-container {
+      background: white;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0px 4px 8px rgba(0,0,0,0.1);
+      width: 380px;
+    }
+    h2 {
+      text-align: center;
+      color: #333;
+    }
+    label {
+      display: block;
+      margin: 10px 0 5px;
+      color: #555;
+    }
+    input {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 15px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+    button {
+      width: 100%;
+      padding: 10px;
+      background: #007BFF;
+      border: none;
+      color: white;
+      font-size: 16px;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #0056b3;
+    }
+    .status-message {
+      display: none;
+      margin-top: 10px;
+      padding: 10px;
+      border-radius: 5px;
+      text-align: center;
+      font-weight: bold;
+    }
+    .test-accounts {
+      margin-top: 20px;
+      font-size: 14px;
+      background: #f1f1f1;
+      padding: 10px;
+      border-radius: 5px;
+    }
+    .test-accounts h3 {
+      margin-top: 0;
+      font-size: 15px;
+      text-align: center;
+    }
+    .test-accounts code {
+      display: block;
+      margin: 3px 0;
+      padding: 3px;
+      background: #fff;
+      border-radius: 3px;
+      font-family: monospace;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="login-container">
+    <h2>Vendor Login</h2>
+    <label for="email">Email</label>
+    <input type="email" id="email" placeholder="Enter your email">
+
+    <label for="password">Password</label>
+    <input type="password" id="password" placeholder="Enter your password">
+
+    <button onclick="loginVendor()">Login</button>
+
+    <div id="statusMessage" class="status-message"></div>
+
+    <!-- Dummy test accounts -->
+    <!-- <div class="test-accounts">
+      <h3>Test Accounts</h3>
+      <code>Email: pending@vendor.com | Pass: 1234</code>
+      <code>Email: rejected@vendor.com | Pass: 1234</code>
+      <code>Email: approved@vendor.com | Pass: 1234</code>
+    </div> -->
+    
+  </div>
+
+ <script>
+  function showMessage(text, bg, color) {
+    const message = document.getElementById("statusMessage");
+    message.style.display = "block";
+    message.innerText = text;
+    message.style.background = bg;
+    message.style.color = color;
+  }
+
+  async function loginVendor() {
+    let email = document.getElementById("email").value.trim();
+    let password = document.getElementById("password").value.trim();
+
+    if (!email || !password) {
+      showMessage("Please fill in all fields.", "#f8d7da", "#721c24");
+      return;
+    }
+
+    try {
+      let response = await fetch("http://localhost:8080/api/vendor/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password })
+      });
+
+      if (!response.ok) {
+        showMessage("Invalid login credentials.", "#f8d7da", "#721c24");
+        return;
+      }
+
+      let data = await response.json();
+      console.log("Login Response:", data);
+
+      // Save token for future API requests
+      if (data.token) {
+        localStorage.setItem("vendorToken", data.token);
+        localStorage.setItem("vendorId", data.vendorId);
+        localStorage.setItem("vendorName", data.businessName);
+      }
+
+      // Handle status
+      if (data.status === "PENDING") {
+        showMessage("Your request is pending approval.", "#fff3cd", "#856404");
+      } 
+      else if (data.status === "REJECTED") {
+        showMessage("Your request was rejected. Please try again.", "#f8d7da", "#721c24");
+      } 
+      else if (data.status === "APPROVED") {
+        // Redirect to dashboard
+        window.location.href = "vendor-dashboard.html";
+      } 
+      else {
+        showMessage("Unexpected response from server.", "#f8d7da", "#721c24");
+      }
+
+    } catch (error) {
+      console.error("Login error:", error);
+      showMessage("Unable to connect to server.", "#f8d7da", "#721c24");
+    }
+  }
+</script>
+
+</body>
+</html>

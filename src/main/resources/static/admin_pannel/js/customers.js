@@ -42,7 +42,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function fetchCustomers(searchTerm = '') {
         try {
-            const response = await fetch(`https://ecommercebackend-i16e.onrender.com/api/users/by-role?role=CUSTOMER`, {
+            const response = await fetch(`http://localhost:8080/api/users/by-role?role=CUSTOMER`, {
                 headers: {
                     'Authorization': `Bearer ${token}`
                 }
@@ -125,7 +125,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const updatedData = { username, email };
 
         try {
-            const response = await fetch(`https://ecommercebackend-i16e.onrender.com/api/users/${id}`, {
+            const response = await fetch(`http://localhost:8080/api/users/${id}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
@@ -152,7 +152,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!confirm('Are you sure you want to delete this customer?')) return;
 
         try {
-            const response = await fetch(`https://ecommercebackend-i16e.onrender.com/api/users/${id}`, {
+            const response = await fetch(`http://localhost:8080/api/users/${id}`, {
                 method: 'DELETE',
                 headers: {
                     'Authorization': `Bearer ${token}`
@@ -208,7 +208,7 @@ document.addEventListener('DOMContentLoaded', () => {
         };
 
         try {
-            const response = await fetch('https://ecommercebackend-i16e.onrender.com/api/auth/register', {
+            const response = await fetch('http://localhost:8080/api/auth/register', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

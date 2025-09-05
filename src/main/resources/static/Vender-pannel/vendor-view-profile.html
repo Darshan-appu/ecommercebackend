@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Vendor Panel</title>
+    <style>
+        /* Modern CSS Reset & Box Sizing */
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Full Page Container */
+        body {
+            font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f0f2f5;
+            display: flex;
+            min-height: 100vh;
+            color: #343a40;
+        }
+
+        /* Sidebar Styling (from your design) */
+        .sidebar {
+            width: 250px;
+            background: #2c3e50;
+            color: white;
+            padding-top: 30px;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .sidebar h2 {
+            font-size: 1.5rem;
+            text-align: center;
+            margin-bottom: 40px;
+            color: #ecf0f1;
+        }
+
+        .sidebar a {
+            padding: 15px 25px;
+            text-decoration: none;
+            color: #ecf0f1;
+            display: block;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            font-size: 1.05rem;
+        }
+
+        .sidebar a:hover {
+            background-color: rgba(52, 152, 219, 0.2);
+        }
+
+        .sidebar a.active {
+            background-color: #3498db;
+            color: white;
+            font-weight: 600;
+        }
+
+        /* Main Content Container */
+        .main-container {
+            flex: 1;
+            padding: 40px;
+            display: flex;
+            justify-content: left;
+            align-items: flex-start;
+        }
+
+        /* Profile Card Container (The main white box) */
+        .profile-container {
+            background-color: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+            padding: 40px;
+            width: 100%;
+            max-width: 900px;
+        }
+
+        /* Header Section */
+        .profile-header {
+            border-bottom: 2px solid #e9ecef;
+            padding-bottom: 25px;
+            margin-bottom: 25px;
+        }
+
+        .profile-header h1 {
+            font-size: 1.8rem;
+            color: #34495e;
+            font-weight: 700;
+        }
+
+        /* Profile Details Grid */
+        .profile-details {
+            display: grid;
+            grid-template-columns: 200px 1fr;
+            gap: 20px;
+        }
+
+        /* Each detail row */
+        .profile-item {
+            display: contents;
+        }
+
+        .profile-item strong {
+            font-weight: 600;
+            color: #6c757d;
+            text-align: left;
+            padding-right: 15px;
+            position: relative;
+        }
+
+        /* Custom style for the colon */
+        .profile-item strong::after {
+            content: ":";
+            position: absolute;
+            right: 0;
+            color: #ced4da;
+        }
+
+        .profile-item span {
+            color: #495057;
+            word-break: break-word;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="sidebar">
+        <h2>Vendor Panel</h2>
+        <a href="vendor-dashboard.html">Dashboard</a>
+        <a href="vendor-add-product.html">Add Product</a>
+        <a href="vendor-product-list.html">Product List</a>
+        <a href="vendor-edit-profile.html">Edit Profile</a>
+        <a href="vendor-view-profile.html" class="active">View Profile</a>
+        <a href="vendor-login.html">Logout</a>
+    </div>
+
+    <div class="main-container">
+        <div class="profile-container">
+
+            <div class="profile-header">
+                <h1 id="profileBusinessName">Loading Profile...</h1>
+            </div>
+
+            <div class="profile-details">
+                <div class="profile-item">
+                    <strong>First Name</strong>
+                    <span id="profileFirstName"></span>
+                </div>
+                <div class="profile-item">
+                    <strong>Last Name</strong>
+                    <span id="profileLastName"></span>
+                </div>
+                <div class="profile-item">
+                    <strong>Email</strong>
+                    <span id="profileEmail"></span>
+                </div>
+                <div class="profile-item">
+                    <strong>Day Phone</strong>
+                    <span id="profilePhoneDay"></span>
+                </div>
+                <div class="profile-item">
+                    <strong>Evening Phone</strong>
+                    <span id="profilePhoneEvening"></span>
+                </div>
+                <div class="profile-item">
+                    <strong>Company Address</strong>
+                    <span id="profileAddress"></span>
+                </div>
+                <div class="profile-item">
+                    <strong>City</strong>
+                    <span id="profileCity"></span>
+                </div>
+                <div class="profile-item">
+                    <strong>State</strong>
+                    <span id="profileState"></span>
+                </div>
+                <div class="profile-item">
+                    <strong>Zip Code</strong>
+                    <span id="profileZipCode"></span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        async function fetchVendorProfile() {
+            const vendorToken = localStorage.getItem("vendorToken");
+
+            if (!vendorToken) {
+                document.getElementById("profileBusinessName").textContent = "Error: Not authenticated. Please log in.";
+                return;
+            }
+
+            try {
+                const response = await fetch("http://localhost:8080/api/vendor/profile", {
+                    method: "GET",
+                    headers: {
+                        "Authorization": `Bearer ${vendorToken}`,
+                        "Content-Type": "application/json"
+                    },
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    document.getElementById("profileBusinessName").textContent = data.businessName || "N/A";
+                    document.getElementById("profileFirstName").textContent = data.firstName || "N/A";
+                    document.getElementById("profileLastName").textContent = data.lastName || "N/A";
+                    document.getElementById("profileEmail").textContent = data.email || "N/A";
+                    document.getElementById("profilePhoneDay").textContent = data.phoneDay || "N/A";
+                    document.getElementById("profilePhoneEvening").textContent = data.phoneEvening || "N/A";
+                    document.getElementById("profileAddress").textContent = data.companyAddress || "N/A";
+                    document.getElementById("profileCity").textContent = data.city || "N/A";
+                    document.getElementById("profileState").textContent = data.state || "N/A";
+                    document.getElementById("profileZipCode").textContent = data.zipCode || "N/A";
+                } else {
+                    document.getElementById("profileBusinessName").textContent = `Error: ${data.message || "Could not load profile"}`;
+                    document.getElementById("profileFirstName").textContent = "";
+                    document.getElementById("profileLastName").textContent = "";
+                    document.getElementById("profileEmail").textContent = "";
+                    document.getElementById("profilePhoneDay").textContent = "";
+                    document.getElementById("profilePhoneEvening").textContent = "";
+                    document.getElementById("profileAddress").textContent = "";
+                    document.getElementById("profileCity").textContent = "";
+                    document.getElementById("profileState").textContent = "";
+                    document.getElementById("profileZipCode").textContent = "";
+                }
+            } catch (error) {
+                console.error("Error fetching profile:", error);
+                document.getElementById("profileBusinessName").textContent = "Failed to fetch profile data. Please check your network connection.";
+                document.getElementById("profileFirstName").textContent = "";
+                document.getElementById("profileLastName").textContent = "";
+                document.getElementById("profileEmail").textContent = "";
+                document.getElementById("profilePhoneDay").textContent = "";
+                document.getElementById("profilePhoneEvening").textContent = "";
+                document.getElementById("profileAddress").textContent = "";
+                document.getElementById("profileCity").textContent = "";
+                document.getElementById("profileState").textContent = "";
+                document.getElementById("profileZipCode").textContent = "";
+            }
+        }
+
+        window.onload = fetchVendorProfile;
+    </script>
+</body>
+</html>

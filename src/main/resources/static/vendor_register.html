@@ -344,6 +344,13 @@
                             </div>
                         </div>
                     </div>
+                    <div class="form-row">
+    <div class="form-group">
+        <label for="password" class="required">Create Password</label>
+        <input type="password" class="form-control" id="password" name="password" required>
+    </div>
+</div>
+
 
                     <div class="disclaimer">
                         <p>Note: Fields marked with * are required.</p>
@@ -388,7 +395,7 @@
     <script src="js/main.js"></script>
 
     <!-- Vendor Registration Script -->
-    <script>
+    <!-- <script>
     document.addEventListener('DOMContentLoaded', function () {
 
         // Generate a unique vendor ID
@@ -436,8 +443,10 @@
                 signature: formData.get('signature')
             };
 
+
+            
             // Send data to Spring Boot backend
-            fetch('https://ecommercebackend-i16e.onrender.com/api/vendor/register', {
+            fetch('https://ecommercebackend-4zll.onrender.com/api/vendor/register', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -469,7 +478,87 @@
             // window.location.href = 'index.html';
         });
     });
+</script> -->
+
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+
+    // Form submission handler
+    document.getElementById('vendorRegistrationForm').addEventListener('submit', function (e) {
+        e.preventDefault();
+
+        // Create a new form data object
+        const formData = new FormData(this);
+
+        // Construct vendorData object (aligned with backend/Postman)
+        const vendorData = {
+            vendorId: null,   // let backend generate
+            businessName: formData.get('businessName'),
+            email: formData.get('email'),
+            status: "PENDING",    // ✅ must be uppercase for backend enum
+            ratings: 0,
+            firstName: formData.get('firstName'),
+            lastName: formData.get('lastName'),
+            companyAddress: formData.get('companyAddress'),
+            city: formData.get('city'),
+            state: formData.get('state'),
+            zipCode: formData.get('zipCode'),
+            phoneDay: formData.get('phoneDay'),
+            phoneEvening: formData.get('phoneEvening'),
+            position: formData.get('position'),
+            serviceDetails: formData.get('serviceDetails'),
+            establishmentDate: formData.get('establishmentDate'),
+            serviceArea: formData.get('serviceArea'),
+            businessType: formData.get('businessType'),
+            insured: formData.get('insured') === 'Yes',   // ✅ match radio value
+            licensed: formData.get('licensed') === 'Yes', // ✅ match radio value
+            licenseNumber: formData.get('licenseNumber') || '',
+            annualSales: formData.get('annualSales') || '',
+            bankName: formData.get('bankName'),
+            beneficiaryName: formData.get('beneficiaryName'),
+            accountNumber: formData.get('accountNumber'),
+            submissionDate: formData.get('submissionDate'),
+            signature: formData.get('signature'),
+            website: formData.get('website') || '',   // ✅ added
+            password: formData.get('password')       // ✅ added
+        };
+
+        // Send data to Spring Boot backend
+        fetch('hhttps://ecommercebackend-4zll.onrender.com/api/vendor/register', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(vendorData)
+        })
+        .then(response => {
+            if (!response.ok) {
+                return response.json().then(err => {
+                    throw new Error(err.message || 'Server error');
+                });
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log('Vendor registered successfully:', data);
+            document.getElementById('successModal').style.display = 'flex';
+        })
+        .catch(error => {
+            console.error('Error submitting form:', error);
+            alert('Failed to submit the form. Please check your details and try again.');
+        });
+    });
+
+    // Close modal button
+    document.getElementById('modalCloseBtn').addEventListener('click', function () {
+        document.getElementById('successModal').style.display = 'none';
+        // Optionally redirect or refresh
+        // window.location.href = 'index.html';
+    });
+});
 </script>
+
 
 </body>
 

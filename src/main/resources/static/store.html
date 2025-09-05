@@ -6,7 +6,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>AEROMATX</title>
 
-  <!-- Styles -->
   <link href="https://fonts.googleapis.com/css?family=Montserrat:400,500,700" rel="stylesheet" />
   <link rel="stylesheet" href="css/bootstrap.min.css" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/assets/owl.carousel.min.css" />
@@ -19,18 +18,85 @@
       opacity: 0.6;
       pointer-events: none;
     }
+    /* Adds a pointer cursor to the clickable area for better user experience */
+    .product-top-link {
+        cursor: pointer;
+    }
+    /* application quick buttons styling */
+    .category-quick-buttons {
+      display: flex;
+      justify-content: center;
+      gap: 14px;
+      background: #f8fafc;
+      padding: 14px 20px;
+      border-top: 1px solid #e5e7eb;
+    }
+    .category-quick-buttons button {
+      background: transparent;
+      color: #0f172a;
+      border: 1.8px solid #d1d5db;
+      padding: 9px 22px;
+      border-radius: 9999px;
+      font-weight: 700;
+      font-size: 13px;
+      letter-spacing: 0.5px;
+      cursor: pointer;
+      text-transform: uppercase;
+      transition: all 0.25s ease-in-out, box-shadow 0.25s ease-in-out;
+      position: relative;
+      overflow: hidden;
+    }
+    .category-quick-buttons button:hover {
+      border-color: #1989AC;
+      color: #1989AC;
+      background: rgba(25, 137, 172, 0.08);
+      box-shadow: 0 4px 12px rgba(25, 137, 172, 0.25);
+      transform: translateY(-2px);
+    }
+    .category-quick-buttons button.active {
+      background: #1989AC;
+      color: white;
+      border-color: #1989AC;
+      box-shadow: 0 4px 14px rgba(25, 137, 172, 0.35);
+    }
+    .category-quick-buttons button::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: rgba(25, 137, 172, 0.12);
+      transition: left 0.3s ease;
+      z-index: 0;
+    }
+    .category-quick-buttons button:hover::before {
+      left: 0;
+    }
+    .category-quick-buttons button span {
+      position: relative;
+      z-index: 1;
+    }
+    .category-quick-buttons a.btn {
+      display: inline-block;
+      padding: 8px 16px;
+      background: #ccc;
+      border-radius: 4px;
+      text-decoration: none;
+      color: black;
+    }
   </style>
 </head>
 <body>
   <div id="header-placeholder"></div>
 
+  <div id="application-buttons-container" class="category-quick-buttons"></div>
+
   <div class="section">
     <div class="container">
       <div class="row">
         <div class="col-md-12">
-          <div class="section-title">
-          <!-- <h3 class="title">Products by SubCategory</h3>--> 
-          </div>
+          <div class="section-title"></div>
         </div>
         <div class="col-md-12" id="subcategory-product-groups"></div>
       </div>
@@ -39,7 +105,6 @@
 
   <div id="footer-placeholder"></div>
 
-  <!-- Scripts -->
   <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
   <script src="js/bootstrap.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/owl.carousel.min.js"></script>
@@ -48,78 +113,168 @@
   <script src="js/frontend-header.js"></script>
   <script src="js/profileBehviour.js"></script>
 
-
   <script>
+    // This function redirects the user to the product view page.
+  function viewProduct(productId) {
+    window.location.href = `product.html?productId=${productId}`;
+}
+
+
     document.addEventListener("DOMContentLoaded", () => {
-      const urlParams = new URLSearchParams(window.location.search);
-      const categoryId = urlParams.get("categoryId");
-      if (!categoryId) return;
+        // Get the categoryId from the URL's query parameters
+        const urlParams = new URLSearchParams(window.location.search);
+        const categoryId = urlParams.get("categoryId");
+        if (!categoryId) return; // Exit if no categoryId is found
 
-      fetch(`https://ecommercebackend-i16e.onrender.com/api/products/by-category/${categoryId}`)
-        .then(res => res.json())
-        .then(products => {
-          const grouped = {};
-          products.forEach(p => {
-            const subName = p.subCategoryName || 'Others';
-            if (!grouped[subName]) grouped[subName] = [];
-            grouped[subName].push(p);
-          });
+        let allProducts = [];
+        let applicationsData = [];
+        const appButtonsContainer = document.getElementById("application-buttons-container");
+        const productContainer = document.getElementById("subcategory-product-groups");
 
-          const container = document.getElementById("subcategory-product-groups");
-          Object.entries(grouped).forEach(([subName, prodList]) => {
-            const section = document.createElement("div");
-            section.className = "subcat-group mb-4";
-            section.innerHTML = `<h4 class='mb-3'>${subName}</h4><div class='row'></div>`;
+        // Renders products, grouping them by sub-category
+        const renderProducts = (productsToDisplay) => {
+            productContainer.innerHTML = ''; // Clear previous products
+            const grouped = {};
 
-            const row = section.querySelector(".row");
-            prodList.forEach(p => {
-              const hasSheet = !!p.datasheetUrl;
-              row.innerHTML += `
-                <div class="col-md-3">
-                  <div class="product modern-product-card">
-                    <div class="product-top-link">
-                      <div class="product-img">
-                        <img src="${p.imageUrl || './img/placeholder.png'}" alt="${p.name}" />
-                      </div>
-                      <div class="product-body">
-                        <p class="product-category">${p.subCategoryName}</p>
-                        <h3 class="product-name">${p.name}</h3>
-                        <h4 class="product-price">₹${p.price?.toFixed(2) || '0.00'}</h4>
-                      </div>
-                    </div>
-                    <div class="product-action d-flex flex-column gap-1">
-                      ${hasSheet
-                        ? `<a href="${p.datasheetUrl}" target="_blank" class="btn btn-sm btn-outline-primary">
-                            <i class="fa fa-file-pdf-o"></i> Download Datasheet
-                          </a>`
-                        : `<button class="btn btn-sm btn-secondary" disabled>
-                            <i class="fa fa-file-pdf-o"></i> No Datasheet
-                          </button>`}
-                      <button class="btn btn-sm btn-success customize-product" data-product='${JSON.stringify(p)}' data-toggle="modal" data-target="#customizeModal">
-                        <i class="fa fa-cog mr-1"></i> Customize
-                      </button>
-                    </div>
-                  </div>
-                </div>`;
+            // Group products by their sub-category name
+            productsToDisplay.forEach(p => {
+                const subName = p.subCategoryName || 'Others';
+                if (!grouped[subName]) grouped[subName] = [];
+                grouped[subName].push(p);
             });
 
-            container.appendChild(section);
-          });
-        })
-        .catch(err => console.error("❌ Error loading grouped products:", err));
+            // Iterate through each sub-category group and create HTML for it
+            Object.entries(grouped).forEach(([subName, prodList]) => {
+                const section = document.createElement("div");
+                section.className = "subcat-group mb-4";
+                section.innerHTML = `<h4 class='mb-3'>${subName}</h4><div class='row'></div>`;
+                const row = section.querySelector(".row");
 
-      $("#header-placeholder").load("header.html", () => {
-        try {
-          FrontendHeader?.init?.();
-        } catch (e) {
-          console.warn("⚠️ FrontendHeader is not defined");
-        }
-      });
-      $("#footer-placeholder").load("footer.html");
+                // Generate HTML for each product card
+                prodList.forEach(p => {
+                    const hasSheet = !!p.datasheetUrl;
+                    const productHtml = `
+                    <div class="col-md-3">
+                        <div class="product modern-product-card">
+                            <div class="product-top-link" onclick="viewProduct('${p.id}')">
+                                <div class="product-img">
+                                    <img src="${p.imageUrl || './img/placeholder.png'}" alt="${p.name}" />
+                                </div>
+                                <div class="product-body">
+                                    <p class="product-category">${p.subCategoryName}</p>
+                                    <h3 class="product-name">${p.name}</h3>
+                                    <h4 class="product-price">₹${p.price?.toFixed(2) || '0.00'}</h4>
+                                </div>
+                            </div>
+                            <div class="product-action d-flex flex-column gap-1">
+                                ${hasSheet
+                                    ? `<a href="${p.datasheetUrl}" target="_blank" class="btn btn-sm btn-outline-primary">
+                                        <i class="fa fa-file-pdf-o"></i> Download Datasheet
+                                    </a>`
+                                    : `<button class="btn btn-sm btn-secondary" disabled>
+                                        <i class="fa fa-file-pdf-o"></i> No Datasheet
+                                    </button>`}
+                                <button class="btn btn-sm btn-success customize-product" data-product='${JSON.stringify(p)}' data-toggle="modal" data-target="#customizeModal">
+                                    <i class="fa fa-cog mr-1"></i> Customize
+                                </button>
+                            </div>
+                        </div>
+                    </div>`;
+                    row.innerHTML += productHtml;
+                });
+                productContainer.appendChild(section);
+            });
+        };
+
+        // Filters and displays products based on the selected application
+        const filterAndDisplayProducts = (selectedApp, selectedAppId) => {
+            let filteredProducts;
+            if (selectedApp === 'ALL') {
+                filteredProducts = allProducts;
+            } else {
+                const app = applicationsData.find(a => String(a.id) === String(selectedAppId));
+                filteredProducts = app ? app.products : [];
+            }
+            renderProducts(filteredProducts);
+
+            // Update the URL in the browser's history without reloading the page
+            const newUrl = `store.html?categoryId=${categoryId}${selectedApp !== 'ALL' ? `&applicationId=${selectedAppId}` : ''}`;
+            window.history.pushState({ path: newUrl }, '', newUrl);
+        };
+
+        // Fetches and loads application filter buttons
+        fetch("https://ecommercebackend-4zll.onrender.com/api/applications")
+            .then(res => res.json())
+            .then(applications => {
+                applicationsData = applications;
+                applications.sort((a, b) => a.name.localeCompare(b.name));
+
+                // Create and append the "ALL" button
+                const allButton = document.createElement("button");
+                allButton.textContent = "ALL";
+                allButton.className = "active";
+                allButton.dataset.application = "ALL";
+                allButton.dataset.applicationId = "ALL";
+                appButtonsContainer.appendChild(allButton);
+
+                // Create and append buttons for each application from the API
+                applications.forEach(app => {
+                    const button = document.createElement("button");
+                    button.textContent = app.name.toUpperCase();
+                    button.dataset.application = app.name;
+                    button.dataset.applicationId = app.id;
+                    appButtonsContainer.appendChild(button);
+                });
+
+                // Add a click event listener to the button container
+                appButtonsContainer.addEventListener("click", event => {
+                    if (event.target.tagName === "BUTTON") {
+                        const selectedApp = event.target.dataset.application;
+                        const selectedAppId = event.target.dataset.applicationId;
+                        // Deactivate all buttons and activate the clicked one
+                        document.querySelectorAll("#application-buttons-container button").forEach(btn => btn.classList.remove("active"));
+                        event.target.classList.add("active");
+                        filterAndDisplayProducts(selectedApp, selectedAppId);
+                    }
+                });
+
+                // Apply initial filter based on URL on page load
+                const initialAppId = urlParams.get('applicationId');
+                if (initialAppId) {
+                    const initialAppButton = document.querySelector(`[data-application-id="${initialAppId}"]`);
+                    if (initialAppButton) initialAppButton.click();
+                }
+            })
+            .catch(err => console.error("❌ Error fetching applications:", err));
+
+        // Load products by category
+        fetch(`https://ecommercebackend-4zll.onrender.com/api/products/by-category/${categoryId}`)
+            .then(res => res.json())
+            .then(products => {
+                allProducts = products;
+                const initialAppId = urlParams.get('applicationId');
+                if (initialAppId) {
+                    const initialAppButton = document.querySelector(`[data-application-id="${initialAppId}"]`);
+                    if (initialAppButton) {
+                        const selectedApp = initialAppButton.dataset.application;
+                        filterAndDisplayProducts(selectedApp, initialAppId);
+                    } else {
+                        filterAndDisplayProducts('ALL');
+                    }
+                } else {
+                    filterAndDisplayProducts('ALL');
+                }
+            })
+            .catch(err => console.error("❌ Error loading products:", err));
+
+        // Load header/footer
+        $("#header-placeholder").load("header.html", () => {
+            try { FrontendHeader?.init?.(); } catch (e) { console.warn("⚠️ FrontendHeader is not defined"); }
+        });
+        $("#footer-placeholder").load("footer.html");
     });
   </script>
 
-  <!-- Customize Modal -->
   <div class="modal fade" id="customizeModal" tabindex="-1" role="dialog">
     <div class="modal-dialog modal-md" role="document">
       <div class="modal-content p-3">
@@ -130,12 +285,13 @@
         <div class="modal-body">
           <p><strong id="c-prod-name"></strong></p>
           <div id="c-specs-container"></div>
+          
           <div class="form-group">
             <label>Quantity</label>
-            <input id="c-qty" type="number" class="form-control" value="1" min="1" />
+            <input id="c-qty" type="number" class="form-control" value="1" min="1">
           </div>
           <div class="form-group">
-            <label>Notes</label>
+            <label>Additional Notes</label>
             <textarea id="c-notes" class="form-control" placeholder="Optional notes..."></textarea>
           </div>
         </div>
@@ -148,24 +304,29 @@
   </div>
 
   <script>
+    // Handles the 'Customize' modal logic
     let selectedProduct = null;
 
     $('#customizeModal').on('show.bs.modal', e => {
+      // Get product data from the button's data-product attribute
       selectedProduct = JSON.parse($(e.relatedTarget).attr('data-product'));
+      
+      // Populate the modal with the product's details
       $('#c-prod-name').text(selectedProduct.name);
       $('#c-qty').val(1);
       $('#c-notes').val('');
-      const container = $('#c-specs-container');
-      container.empty();
+      
+      const container = $('#c-specs-container').empty();
 
-      const groupedSpecs = {};
-      selectedProduct.specifications?.forEach(spec => {
-        if (!groupedSpecs[spec.key]) groupedSpecs[spec.key] = new Set();
-        groupedSpecs[spec.key].add(spec.value);
+      // Map and display product specifications
+      const specMap = {};
+      selectedProduct.specifications?.forEach(s => {
+        if (!specMap[s.key]) specMap[s.key] = new Set();
+        specMap[s.key].add(s.value);
       });
 
-      Object.entries(groupedSpecs).forEach(([key, values]) => {
-        const select = $(`
+      Object.entries(specMap).forEach(([key, values]) => {
+        container.append(`
           <div class="form-group">
             <label>${key}</label>
             <select class="form-control spec-selector" data-key="${key}">
@@ -173,66 +334,58 @@
             </select>
           </div>
         `);
-        container.append(select);
       });
     });
 
-    $('#c-add-btn').click(function () {
-  const qty = Math.max(1, parseInt($('#c-qty').val()));
-  const notes = $('#c-notes').val().trim();
-
-  const specs = [];
-  $('.spec-selector').each(function () {
-    const key = $(this).data('key');
-    const value = $(this).val();
-    specs.push({ key, value });
-  });
-
-  const payload = {
-    productId: selectedProduct.id,
-    quantity: qty,
-    notes,
-    specifications: specs
-  };
-
-  fetch('https://ecommercebackend-i16e.onrender.com/api/cart', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': 'Bearer ' + localStorage.getItem('userToken')
-    },
-    body: JSON.stringify(payload)
-  })
-    .then(async res => {
-      const contentType = res.headers.get('content-type');
-      if (contentType && contentType.includes('application/json')) {
-        const data = await res.json();
-        console.log('✅ Added to cart (JSON):', data);
-      } else {
-        const text = await res.text();
-        console.log('✅ Added to cart (Text):', text);
+    $('#c-add-btn').click(() => {
+      const token = localStorage.getItem('userToken');
+      if (!token) {
+        alert("⚠ Please login to add items to your cart.");
+        return;
       }
 
-      // ✅ Close modal and clear backdrop
-      $('#customizeModal').modal('hide');
-      $('body').removeClass('modal-open');
-      $('.modal-backdrop').remove();
+      // Get quantity, notes, and specifications from the modal
+      const qty = Math.max(1, parseInt($('#c-qty').val()));
+      const notes = $('#c-notes').val().trim();
+      
+      const specs = [];
 
-      // ✅ Show a toast or alert
-      alert("✅ Item successfully added to cart!");
+      $('.spec-selector').each(function () {
+        specs.push({ key: $(this).data('key'), value: $(this).val() });
+      });
 
-      // ✅ Optional: Refresh the page or section (uncomment as needed)
-      // location.reload(); // Uncomment to refresh the whole page
+      const payload = {
+        productId: selectedProduct.id,
+        quantity: qty,
+        notes,
+        specifications: specs
+      };
 
-    })
-    .catch(err => {
-      console.error('❌ Error adding to cart:', err);
-      alert("⚠️ Please login to add items to your cart.");
+      // Send the payload to the server
+      fetch('https://ecommercebackend-4zll.onrender.com/api/cart', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + token
+        },
+        body: JSON.stringify(payload)
+      })
+      .then(res => res.text())
+      .then(msg => {
+        // Hide the modal and clear the backdrop
+        $('#customizeModal').modal('hide');
+        $('body').removeClass('modal-open');
+        $('.modal-backdrop').remove();
+        alert("✅ " + msg);
+
+        // FIX: After successfully adding to cart, reset the selectedProduct variable
+        selectedProduct = null;
+      })
+      .catch(err => {
+        console.error('❌ Error:', err);
+        alert("❌ Failed to add item to cart.");
+      });
     });
-});
-
-
-  
   </script>
 </body>
 </html>

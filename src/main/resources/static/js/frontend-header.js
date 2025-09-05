@@ -1,8 +1,8 @@
 (function() {
     console.log("✅ frontend-header.js loaded");
 
-    const searchCategorySelect = document.getElementById("search-category-select");
-    const mainNavCategoryList = document.getElementById("main-nav-category-list");
+    const searchCategorySelect = document.getElementById('search-category-select');
+    const mainNavCategoryList = document.getElementById('main-nav-category-list');
 
     if (!searchCategorySelect && !mainNavCategoryList) {
         console.warn("❌ Category target elements not found in the DOM");
@@ -11,7 +11,7 @@
 
     async function loadFrontendCategories() {
         try {
-            const response = await fetch("https://ecommercebackend-i16e.onrender.com/api/categories");
+            const response = await fetch('http://localhost:8080/api/categories');
             if (!response.ok) {
                 throw new Error(`HTTP error! Status: ${response.status}`);
             }
@@ -36,15 +36,11 @@
                 return;
             }
 
-            // Get current categoryId from URL
-            const urlParams = new URLSearchParams(window.location.search);
-            const currentCategoryId = urlParams.get("categoryId");
-
             // Insert categories
-            categories.forEach((category) => {
+            categories.forEach(category => {
                 // Populate dropdown
                 if (searchCategorySelect) {
-                    const option = document.createElement("option");
+                    const option = document.createElement('option');
                     option.value = category.slug;
                     option.textContent = category.name;
                     searchCategorySelect.appendChild(option);
@@ -52,32 +48,27 @@
 
                 // Populate main nav with correct store.html redirect
                 if (mainNavCategoryList) {
-                    const listItem = document.createElement("li");
+                    const listItem = document.createElement('li');
                     listItem.innerHTML = `<a href="store.html?categoryId=${category.id}">${category.name}</a>`;
-
-                    // ✅ Highlight current category
-                    if (currentCategoryId && currentCategoryId === String(category.id)) {
-                        listItem.querySelector("a").classList.add("active-category");
-                    }
-
                     mainNavCategoryList.appendChild(listItem);
                 }
             });
 
             console.log("✅ Categories successfully loaded");
+
         } catch (error) {
-            console.error("❌ Failed to load categories:", error);
+            console.error('❌ Failed to load categories:', error);
 
             if (searchCategorySelect && searchCategorySelect.options.length <= 1) {
-                const errorOption = document.createElement("option");
-                errorOption.textContent = "Error loading categories";
+                const errorOption = document.createElement('option');
+                errorOption.textContent = 'Error loading categories';
                 errorOption.disabled = true;
                 searchCategorySelect.appendChild(errorOption);
             }
 
             if (mainNavCategoryList && mainNavCategoryList.children.length <= 1) {
-                const errorItem = document.createElement("li");
-                errorItem.innerHTML = "<a>Error loading categories</a>";
+                const errorItem = document.createElement('li');
+                errorItem.innerHTML = '<a>Error loading categories</a>';
                 mainNavCategoryList.appendChild(errorItem);
             }
         }
