@@ -27,7 +27,7 @@ import java.math.BigDecimal;
 
 @RestController
 @RequestMapping("/api/products")
-@CrossOrigin(origins = {"http://localhost:8080", "http://127.0.0.1:5500","https://ecommercebackend-i16e.onrender.com"})
+@CrossOrigin(origins = {"http://localhost:8080", "http://127.0.0.1:5500","https://ecommercebackend-4zll.onrender.com"})
 public class PublicProductController {
 
     @Autowired
