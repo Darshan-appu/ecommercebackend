@@ -1610,7 +1610,7 @@ document.addEventListener("DOMContentLoaded", function() {
             };
 
             // !!! IMPORTANT: Replace with your actual login API endpoint !!!
-            const API_ENDPOINT = "http://localhost:8080/api/login"; // Example URL
+            const API_ENDPOINT = "https://ecommercebackend-4zll.onrender.com/api/login"; // Example URL
 
             try {
                 // Make the API call using fetch

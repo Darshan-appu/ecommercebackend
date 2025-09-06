@@ -1,6 +1,6 @@
 // API Configuration
 const API_CONFIG = {
-    BASE_URL: 'http://localhost:8080/api',
+    BASE_URL: 'https://ecommercebackend-4zll.onrender.com/api',
     TIMEOUT: 10000
 };
 

@@ -43,7 +43,7 @@ import java.util.List;
 
 
 @RestController
-@RequestMapping("/api/vendorr")
+@RequestMapping("/api/vendor")
 @CrossOrigin(origins = "*")
 @RequiredArgsConstructor
 public class VendorController {

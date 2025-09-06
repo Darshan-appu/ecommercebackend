@@ -11,7 +11,7 @@ import com.aeromatx.back.service.SubCategoryService;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/subcategoriess")
+@RequestMapping("/api/subcategories")
 public class SubCategoryController {
 
     @Autowired

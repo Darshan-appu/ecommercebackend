@@ -45,7 +45,7 @@ function loadCartItems() {
         return;
     }
 
-    fetch("http://localhost:8080/api/cart", {
+    fetch("https://ecommercebackend-4zll.onrender.com/api/cart", {
         headers: {
             Authorization: `Bearer ${token}`,
         },
@@ -151,7 +151,7 @@ function updateCartCounts() {
         return;
     }
 
-    fetch("http://localhost:8080/api/cart", {
+    fetch("https://ecommercebackend-4zll.onrender.com/api/cart", {
         headers: {
             Authorization: `Bearer ${token}`,
         },
@@ -190,7 +190,7 @@ function deleteCartItem(cartItemId) {
 
     if (!confirm("Are you sure you want to remove this item from your cart?")) return;
 
-    fetch(`http://localhost:8080/api/cart/${cartItemId}`, {
+    fetch(`https://ecommercebackend-4zll.onrender.com/api/cart/${cartItemId}`, {
         method: 'DELETE',
         headers: {
             Authorization: `Bearer ${token}`,
@@ -214,7 +214,7 @@ function clearCartItems() {
 
     if (!confirm("Are you sure you want to clear your entire cart?")) return;
 
-    fetch("http://localhost:8080/api/cart/clear", {
+    fetch("https://ecommercebackend-4zll.onrender.com/api/cart/clear", {
         method: 'DELETE',
         headers: {
             Authorization: `Bearer ${token}`,
@@ -247,7 +247,7 @@ function updateCartItemQuantity(cartItemId, newQuantity) {
         return;
     }
 
-    fetch(`http://localhost:8080/api/cart`, {
+    fetch(`https://ecommercebackend-4zll.onrender.com/api/cart`, {
         headers: {
             Authorization: `Bearer ${token}`,
         },
@@ -270,7 +270,7 @@ function updateCartItemQuantity(cartItemId, newQuantity) {
                 specifications: transformedSpecifications
             };
 
-            return fetch(`http://localhost:8080/api/cart/${cartItemId}`, {
+            return fetch(`https://ecommercebackend-4zll.onrender.com/api/cart/${cartItemId}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',

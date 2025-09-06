@@ -6,7 +6,7 @@
 // -------------------------------------------------------------
 
 // --- Configuration ---------------------------------------------------------
-const API_BASE_URL = 'http://localhost:8080/api/categories'; // Spring Boot API
+const API_BASE_URL = 'https://ecommercebackend-4zll.onrender.com/api/categories'; // Spring Boot API
 
 // --- DOM REFS --------------------------------------------------------------
 const categoriesTableBody = document.querySelector('#categoriesTable tbody');

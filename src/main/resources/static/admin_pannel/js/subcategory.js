@@ -1,7 +1,7 @@
 /* -----------------  js/subcategories.js  ----------------- */
 
 /* ------------ Configuration ------------ */
-const API_BASE = 'http://localhost:8080/api';
+const API_BASE = 'https://ecommercebackend-4zll.onrender.com/api';
 
 /* ------------ DOM  ------------ */
 const subcategoryTableBody = document.querySelector('#subcategoriesTable tbody');
